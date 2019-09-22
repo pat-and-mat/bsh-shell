@@ -1,7 +1,7 @@
 #ifndef PATH_CMD_H
 #define PATH_CMD_H
 
-#include <cmd.h>
+#include <cmds/cmd.h>
 
 struct vector;
 

@@ -11,7 +11,7 @@ TARGET = $(TARGETDIR)/$(NAME)
 NECESSARY_DIRS = $(dir $(OBJ) $(TARGET)) 
 
 CC = gcc
-CFLAGS = -c $(addprefix -I, $(dir $(HEADERS)))
+CFLAGS = -c -Iinclude
 
 $(OBJDIR)/%.o: %.c $(HEADERS)
 	$(CC) $(CFLAGS) $< -o $@

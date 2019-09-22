@@ -1,7 +1,7 @@
 #ifndef VECTOR_H
 #define VECTOR_H
 
-typedef struct vector
+struct vector
 {
     void **items;
     int capacity;

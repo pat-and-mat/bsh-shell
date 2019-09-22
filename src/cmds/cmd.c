@@ -1,4 +1,4 @@
-#include <cmd.h>
+#include <cmds/cmd.h>
 
 void cmd_init(struct cmd *c, int type, int (*run)(struct cmd *c))
 {
