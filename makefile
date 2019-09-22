@@ -5,8 +5,7 @@ OBJDIR = obj
 
 SRC = $(wildcard src/*.c) $(wildcard src/*/*.c)
 OBJ = $(addprefix $(OBJDIR)/, $(patsubst %.c, %.o, $(SRC)))
-HEADERS = $(wildcard src/*.h) $(wildcard src/*/*.h) \
-			$(wildcard include/*.h) $(wildcard src/*/include/*.h)
+HEADERS = $(wildcard include/*.h) $(wildcard include/*/*.h)
 TARGET = $(TARGETDIR)/$(NAME)
 
 NECESSARY_DIRS = $(dir $(OBJ) $(TARGET)) 
