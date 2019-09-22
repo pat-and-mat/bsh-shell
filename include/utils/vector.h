@@ -5,7 +5,7 @@ typedef struct vector
 {
     void **items;
     int capacity;
-    int total;
+    int count;
 };
 
 void vector_init(struct vector *);
