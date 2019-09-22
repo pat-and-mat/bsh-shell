@@ -12,7 +12,7 @@ void vector_init(struct vector *v)
     v->items = malloc(sizeof(void *) * v->capacity);
 }
 
-int vector_total(struct vector *v)
+int vector_count(struct vector *v)
 {
     return v->count;
 }

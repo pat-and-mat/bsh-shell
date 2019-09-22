@@ -9,7 +9,7 @@ struct vector
 };
 
 void vector_init(struct vector *);
-int vector_total(struct vector *);
+int vector_count(struct vector *);
 static void vector_resize(struct vector *, int);
 void vector_add(struct vector *, void *);
 void vector_set(struct vector *, int, void *);
