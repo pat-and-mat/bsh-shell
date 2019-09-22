@@ -1,6 +1,8 @@
 #ifndef CMD_H
 #define CMD_H
 
+#define CMD_T_PATH_CMD 1
+
 struct cmd
 {
     int type;
