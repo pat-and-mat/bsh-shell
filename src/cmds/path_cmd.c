@@ -7,6 +7,7 @@
 void path_cmd_init(struct path_cmd *c)
 {
     init_command(&c->base, CMD_T_PATH_CMD, path_cmd_run);
+    vector_init(c->args);
 }
 
 void path_cmd_free(struct path_cmd *c)
