@@ -16,6 +16,11 @@ void path_cmd_free(struct path_cmd *c)
     free(c);
 }
 
+void path_cmd_add_arg(struct path_cmd *c, char *arg)
+{
+    vector_add(c->args, arg);
+}
+
 int path_cmd_run(struct cmd *c)
 {
     struct path_cmd *path_cmd = (struct path_cmd *)c;
