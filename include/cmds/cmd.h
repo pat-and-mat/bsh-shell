@@ -10,5 +10,7 @@ struct cmd
 };
 
 void cmd_init(struct cmd *c, int type, int (*run)(struct cmd *c));
+int cmd_get_type(struct cmd *c);
+int cmd_run(struct cmd *c);
 
 #endif
