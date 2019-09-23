@@ -6,9 +6,10 @@ struct vector
     void **items;
     int capacity;
     int count;
+    size_t item_size;
 };
 
-void vector_init(struct vector *);
+void vector_init(struct vector *, size_t);
 int vector_count(struct vector *);
 static void vector_resize(struct vector *, int);
 void vector_add(struct vector *, void *);

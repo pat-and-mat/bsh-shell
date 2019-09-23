@@ -9,12 +9,17 @@ struct path_cmd *parser_parse_path_cmd(struct parser *p);
 
 void parser_init(struct parser *p, struct vector *tokens)
 {
-    p->tokens = tokens;
     p->i = 0;
+
+    p->tokens = (struct vector *)malloc(sizeof p->tokens);
+    vector_init(p->tokens, sizeof(struct token));
+    for (int i = 0; i < vector_count(tokens); i++)
+        vector_add(p->tokens, vector_get(tokens, i));
 }
 
 void parser_free(struct parser *p)
 {
+    vector_free(p->tokens);
     free(p);
 }
 

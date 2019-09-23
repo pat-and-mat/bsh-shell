@@ -6,11 +6,11 @@
 struct token
 {
     int type;
-    const char *lex;
+    char *lex;
 };
 
-void token_init(struct token *t, int type, const char *lex);
+void token_init(struct token *t, int type, char *lex);
 int token_get_type(struct token *t);
-const char *token_get_lex(struct token *t);
+char *token_get_lex(struct token *t);
 
 #endif
