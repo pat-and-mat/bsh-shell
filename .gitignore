@@ -4,3 +4,8 @@
 # Compilation files
 obj
 bin
+
+tests/obj
+tests/bin
+
+tests/log

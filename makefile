@@ -13,16 +13,20 @@ TARGET = $(TARGET_DIR)/$(NAME)
 
 TESTS_DIR = tests
 TESTS_SRC_ = $(wildcard $(TESTS_DIR)/*_test.c) $(wildcard $(TESTS_DIR)/*/*_test.c) \
-				$(wildcard $(TESTS_DIR)/*_tests.c) $(wildcard $(TESTS_DIR)/*/*_tests.c)
+				$(wildcard $(TESTS_DIR)/*_tests.c) $(wildcard $(TESTS_DIR)/*/*_tests.c) \
+				$(wildcard $(TESTS_DIR)/*/*/*_test.c) $(wildcard $(TESTS_DIR)/*/*/*_tests.c)
 TESTS_SRC = $(TESTS_SRC_:$(TESTS_DIR)/%=%)
 TESTS_OBJ = $(addprefix $(TESTS_DIR)/$(OBJ_DIR)/, $(patsubst %.c, %.o, $(TESTS_SRC)))
 TESTS_TARGETS = $(addprefix $(TESTS_DIR)/$(TARGET_DIR)/, $(patsubst %.c, %, $(TESTS_SRC)))
+TESTS_TARGETS_ = $(TESTS_TARGETS:$(TESTS_DIR)/$(TARGET_DIR)/%=%)
 
 NECESSARY_DIRS = $(dir $(OBJ) $(TARGET)) 
-TESTS_NECESSARY_DIRS = $(dir $(TESTS_OBJ) $(TESTS_TARGETS))
+TESTS_NECESSARY_DIRS = $(dir $(TESTS_OBJ) $(TESTS_TARGETS)) $(TESTS_DIR)/log
 
 CC = gcc
 CFLAGS = -c -Iinclude
+
+VALGRIND = valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes
 
 $(OBJ_DIR)/%.o: %.c $(HEADERS)
 	$(CC) $(CFLAGS) $< -o $@
@@ -44,17 +48,25 @@ $(TESTS_DIR)/$(TARGET_DIR)/%: $(TESTS_DIR)/$(OBJ_DIR)/%.o $(OBJ)
 
 .PHONY: compile run clean dirs test
 
+clean:
+	rm -rf obj bin
+	rm -rf tests/obj tests/bin tests/log
+
 compile: $(NECESSARY_DIRS) $(TARGET)
 
 run: compile
 	./$(TARGET)
 
 test: $(NECESSARY_DIRS) $(TESTS_NECESSARY_DIRS) $(TESTS_TARGETS)
-	@for target in $(TESTS_TARGETS) ; do \
-		echo Running tests in $(subst $(TARGET_DIR),,$$target) ; \
-		./$$target; \
-	done
-
-clean:
-	rm -rf obj bin
-	rm -rf tests/obj tests/bin
+	@for target in $(TESTS_TARGETS_) ; do \
+		echo; \
+		if ./$(TESTS_DIR)/$(TARGET_DIR)/$$target; then \
+			echo Test on $$target succeded; \
+		else \
+			echo Test on $$target failed; \
+		fi; \
+		echo Running memory test on $$target; \
+		install -D /dev/null $(TESTS_DIR)/log/$$target.log; \
+		$(VALGRIND) --log-file=$(TESTS_DIR)/log/$$target.log ./$(TESTS_DIR)/$(TARGET_DIR)/$$target; \
+		echo; \
+	done;
