@@ -60,13 +60,16 @@ run: compile
 test: $(NECESSARY_DIRS) $(TESTS_NECESSARY_DIRS) $(TESTS_TARGETS)
 	@for target in $(TESTS_TARGETS_) ; do \
 		echo; \
+		echo -----------------------------------------; \
 		if ./$(TESTS_DIR)/$(TARGET_DIR)/$$target; then \
+			echo; \
 			echo Test on $$target succeded; \
 		else \
+			echo; \
 			echo Test on $$target failed; \
 		fi; \
 		echo Running memory test on $$target; \
 		install -D /dev/null $(TESTS_DIR)/log/$$target.log; \
-		$(VALGRIND) --log-file=$(TESTS_DIR)/log/$$target.log ./$(TESTS_DIR)/$(TARGET_DIR)/$$target; \
+		$(VALGRIND) --log-file=$(TESTS_DIR)/log/$$target.log ./$(TESTS_DIR)/$(TARGET_DIR)/$$target > /dev/null; \
 		echo; \
 	done;
