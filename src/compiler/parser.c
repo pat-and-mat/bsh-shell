@@ -12,9 +12,9 @@ void parser_init(struct parser *p, struct vector *tokens)
     p->i = 0;
 
     p->tokens = (struct vector *)malloc(sizeof p->tokens);
-    vector_init(p->tokens, sizeof(struct token));
+    vector_init(p->tokens);
     for (int i = 0; i < vector_count(tokens); i++)
-        vector_add(p->tokens, vector_get(tokens, i));
+        vector_add(p->tokens, vector_get(tokens, i), sizeof(struct token));
 }
 
 void parser_free(struct parser *p)
