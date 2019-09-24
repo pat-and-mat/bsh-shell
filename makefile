@@ -12,9 +12,9 @@ HEADERS = $(wildcard include/*.h) $(wildcard include/*/*.h)
 TARGET = $(TARGET_DIR)/$(NAME)
 
 TESTS_DIR = tests
-TESTS_SRC_ = $(wildcard $(TESTS_DIR)/*_test.c) $(wildcard $(TESTS_DIR)/*/*_test.c) \
-				$(wildcard $(TESTS_DIR)/*_tests.c) $(wildcard $(TESTS_DIR)/*/*_tests.c) \
-				$(wildcard $(TESTS_DIR)/*/*/*_test.c) $(wildcard $(TESTS_DIR)/*/*/*_tests.c)
+TESTS_SRC_ = $(wildcard $(TESTS_DIR)/*.test.c) \
+				$(wildcard $(TESTS_DIR)/*/*.test.c) \
+				$(wildcard $(TESTS_DIR)/*/*/*.test.c)
 TESTS_SRC = $(TESTS_SRC_:$(TESTS_DIR)/%=%)
 TESTS_OBJ = $(addprefix $(TESTS_DIR)/$(OBJ_DIR)/, $(patsubst %.c, %.o, $(TESTS_SRC)))
 TESTS_TARGETS = $(addprefix $(TESTS_DIR)/$(TARGET_DIR)/, $(patsubst %.c, %, $(TESTS_SRC)))
