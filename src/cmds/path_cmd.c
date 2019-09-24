@@ -8,7 +8,7 @@
 void path_cmd_init(struct path_cmd *c)
 {
     cmd_init(&c->base, CMD_T_PATH_CMD, path_cmd_run);
-    c->args = malloc(sizeof c->args);
+    c->args = malloc(sizeof(struct vector));
     vector_init(c->args, sizeof(char *));
 }
 
