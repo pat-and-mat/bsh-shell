@@ -41,16 +41,12 @@ struct cmd *parser_parse(struct parser *p)
 
 struct path_cmd *parser_parse_path_cmd(struct parser *p)
 {
-    struct path_cmd *path_cmd = (struct path_cmd *)xmalloc(sizeof path_cmd);
+    struct path_cmd *path_cmd = xmalloc(sizeof path_cmd);
     path_cmd_init(path_cmd);
 
-    struct token *t;
-    while (p->i < vector_count(p->tokens))
-    {
-        t = (struct token *)vector_get(p->tokens, p->i);
-        if (token_get_type(t) == TOKEN_T_STR)
-            path_cmd_add_arg(path_cmd, token_get_lex(t));
-    }
+    struct token *t = parser_lookahead(p);
+    while (token_get_type(t) == TOKEN_T_STR)
+        path_cmd_add_arg(path_cmd, token_get_lex(t));
 
     return path_cmd;
 }
