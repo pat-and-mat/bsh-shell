@@ -6,11 +6,12 @@
 
 #define VECTOR_INIT_CAPACITY 5
 
-void vector_init(struct vector *v)
+void vector_init(struct vector *v, void (*free_item)(void *item))
 {
     v->capacity = VECTOR_INIT_CAPACITY;
     v->count = 0;
     v->items = malloc(sizeof(void *) * v->capacity);
+    v->free_item = free_item;
 }
 
 int vector_count(struct vector *v)
@@ -62,6 +63,8 @@ void vector_delete(struct vector *v, int index)
     if (index < 0 || index >= v->count)
         return;
 
+    if (v->free_item != NULL)
+        v->free_item(v->items[index]);
     free(v->items[index]);
     v->items[index] = NULL;
 
@@ -81,6 +84,8 @@ void vector_free(struct vector *v)
 {
     for (int i = 0; i < v->count; i++)
     {
+        if (v->free_item != NULL)
+            v->free_item(v->items[i]);
         free(v->items[i]);
         v->items[i] = NULL;
     }

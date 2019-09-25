@@ -9,7 +9,7 @@ int main()
     int i;
 
     struct vector v;
-    vector_init(&v);
+    vector_init(&v, NULL);
 
     char *s = "Bonjour";
     vector_add(&v, s, sizeof(char) * (strlen(s) + 1));
