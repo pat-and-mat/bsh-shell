@@ -1,6 +1,6 @@
-#include <stdlib.h>
 #include <string.h>
 
+#include <utils/xmemory.h>
 #include <compiler/token.h>
 
 void token_init(struct token *t, int type, char *lex)

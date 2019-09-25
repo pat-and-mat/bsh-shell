@@ -21,7 +21,7 @@ int vector_count(struct vector *v)
 
 static void vector_resize(struct vector *v, int capacity)
 {
-    void **items = realloc(v->items, sizeof(void *) * capacity);
+    void **items = xrealloc(v->items, sizeof(void *) * capacity);
     if (items)
     {
         v->items = items;
@@ -33,10 +33,7 @@ void vector_add(struct vector *v, void *item)
 {
     if (v->capacity == v->count)
         vector_resize(v, v->capacity * 2);
-    size_t item_size = xsize_of(item);
-    void *item_cpy = xmalloc(item_size);
-    memcpy(item_cpy, item, item_size);
-    v->items[v->count++] = item_cpy;
+    v->items[v->count++] = xcopy(item);
 }
 
 void vector_set(struct vector *v, int index, void *item)
@@ -46,10 +43,7 @@ void vector_set(struct vector *v, int index, void *item)
         xfree(v->items[index]);
         v->items[index] = item;
     }
-    size_t item_size = xsize_of(item);
-    void *item_cpy = xmalloc(item_size);
-    memcpy(item_cpy, item, item_size);
-    v->items[index] = item_cpy;
+    v->items[index] = xcopy(item);
 }
 
 void *vector_get(struct vector *v, int index)

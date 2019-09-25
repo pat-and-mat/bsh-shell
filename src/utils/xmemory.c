@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 
 #include <utils/xmemory.h>
 
@@ -6,7 +7,7 @@
 
 void *xmalloc(size_t size)
 {
-    size_t *ptr = xmalloc(OFFSET + size);
+    size_t *ptr = malloc(OFFSET + size);
     *ptr = size;
     return ptr + 1;
 }
@@ -26,10 +27,30 @@ void *xrealloc(void *ptr, size_t size)
 
 void xfree(void *ptr)
 {
-    xfree((size_t *)ptr - 1);
+    free((size_t *)ptr - 1);
+}
+
+void *xcopy(void *ptr)
+{
+    size_t item_size = xsize_of(ptr);
+    void *item_cpy = xmalloc(item_size);
+    memcpy(item_cpy, ptr, item_size);
+    return item_cpy;
+}
+
+void *xcopy_with_size(void *ptr, size_t item_size)
+{
+    void *item_cpy = xmalloc(item_size);
+    memcpy(item_cpy, ptr, item_size);
+    return item_cpy;
 }
 
 size_t xsize_of(void *ptr)
 {
     return *((size_t *)ptr - 1);
+}
+
+char *xstring(char *s)
+{
+    return xcopy_with_size(s, sizeof(char) * (strlen(s) + 1));
 }
