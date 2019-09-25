@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <utils/xmemory.h>
 #include <utils/vector.h>
 
 int main()

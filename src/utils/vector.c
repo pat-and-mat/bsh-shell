@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <utils/xmemory.h>
 #include <utils/vector.h>
 
 #define VECTOR_INIT_CAPACITY 5
@@ -11,7 +10,7 @@ void vector_init(struct vector *v)
 {
     v->capacity = VECTOR_INIT_CAPACITY;
     v->count = 0;
-    v->items = xmalloc(sizeof(void *) * v->capacity);
+    v->items = malloc(sizeof(void *) * v->capacity);
 }
 
 int vector_count(struct vector *v)
@@ -21,7 +20,7 @@ int vector_count(struct vector *v)
 
 static void vector_resize(struct vector *v, int capacity)
 {
-    void **items = xrealloc(v->items, sizeof(void *) * capacity);
+    void **items = realloc(v->items, sizeof(void *) * capacity);
     if (items)
     {
         v->items = items;
@@ -29,21 +28,26 @@ static void vector_resize(struct vector *v, int capacity)
     }
 }
 
-void vector_add(struct vector *v, void *item)
+void vector_add(struct vector *v, void *item, size_t item_size)
 {
     if (v->capacity == v->count)
         vector_resize(v, v->capacity * 2);
-    v->items[v->count++] = xcopy(item);
+
+    void *item_cpy = malloc(item_size);
+    memcpy(item_cpy, item, item_size);
+    v->items[v->count++] = item_cpy;
 }
 
-void vector_set(struct vector *v, int index, void *item)
+void vector_set(struct vector *v, int index, void *item, size_t item_size)
 {
     if (index >= 0 && index < v->count)
     {
-        xfree(v->items[index]);
+        free(v->items[index]);
         v->items[index] = item;
     }
-    v->items[index] = xcopy(item);
+    void *item_cpy = malloc(item_size);
+    memcpy(item_cpy, item, item_size);
+    v->items[index] = item_cpy;
 }
 
 void *vector_get(struct vector *v, int index)
@@ -58,7 +62,7 @@ void vector_delete(struct vector *v, int index)
     if (index < 0 || index >= v->count)
         return;
 
-    xfree(v->items[index]);
+    free(v->items[index]);
     v->items[index] = NULL;
 
     for (int i = index; i < v->count - 1; i++)
@@ -77,8 +81,8 @@ void vector_free(struct vector *v)
 {
     for (int i = 0; i < v->count; i++)
     {
-        xfree(v->items[i]);
+        free(v->items[i]);
         v->items[i] = NULL;
     }
-    xfree(v->items);
+    free(v->items);
 }
