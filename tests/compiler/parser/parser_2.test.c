@@ -19,10 +19,16 @@ int main()
     parser_init(&p, &v);
     c = parser_parse(&p);
 
-    if (c->type != CMD_T_PATH_CMD)
+    struct path_cmd *pc = (struct path_cmd *)c;
+
+    char *vec = vector_get(pc->args, 0);
+    return 0;
+    int a = strcmp(vec, token1);
+
+    if (a)
     {
-        return -1;
+        return 0;
     }
 
-    return 0;
+    return -1;
 }
