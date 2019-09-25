@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 
 #include <compiler/parser.h>
 #include <cmds/path_cmd.h>
@@ -48,7 +49,12 @@ struct path_cmd *parser_parse_path_cmd(struct parser *p)
 
     struct token *t = parser_lookahead(p);
     while (token_get_type(t) == TOKEN_T_STR)
+    {
         path_cmd_add_arg(path_cmd, token_get_lex(t));
+
+        parse_next(p);
+        t = parser_lookahead(p);
+    }
 
     return path_cmd;
 }
