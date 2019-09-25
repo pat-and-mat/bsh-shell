@@ -12,7 +12,7 @@ void tokenizer_init(struct tokenizer *t, char *text)
     t->text = malloc(sizeof(char) * (strlen(text) + 1));
     strcpy(t->text, text);
     t->tokens = malloc(sizeof(struct vector));
-    vector_init(t->tokens);
+    vector_init(t->tokens, (void (*)(void *))token_free);
     t->makes_history = 1;
 }
 
@@ -41,30 +41,31 @@ int tokenizer_get_makes_history(struct tokenizer *t)
 void tokenizer_tokenize(struct tokenizer *t)
 {
     t->makes_history = 1;
-
-    t->tokens = malloc(sizeof(struct vector));
+    char text_mem[strlen(t->text) + 1];
+    char *text = text_mem;
+    strcpy(text, t->text);
     char *delim; /* Points to first space delimiter */
 
-    t->text[strlen(t->text) - 1] = ' '; /* Replace trailing ’\n’ with space */
-    if (*t->text && (*t->text == ' '))
+    text[strlen(text) - 1] = ' '; /* Replace trailing ’\n’ with space */
+    if (*text && (*text == ' '))
     {
         t->makes_history = 0;
-        while (*t->text && (*t->text == ' ')) /* Ignore leading spaces */
-            t->text++;
+        while (*text && (*text == ' ')) /* Ignore leading spaces */
+            text++;
     }
 
     struct token token;
     /* Build the argv list */
-    while ((delim = strchr(t->text, ' ')))
+    while ((delim = strchr(text, ' ')))
     {
         *delim = '\0';
 
-        token_init(&token, tokenizer_get_token_type(t->text), t->text);
+        token_init(&token, tokenizer_get_token_type(text), text);
         vector_add(t->tokens, &token, sizeof(struct token));
 
-        t->text = delim + 1;
-        while (*t->text && (*t->text == ' ')) /* Ignore spaces */
-            t->text++;
+        text = delim + 1;
+        while (*text && (*text == ' ')) /* Ignore spaces */
+            text++;
     }
 
     token_init(&token, TOKEN_T_EOF, "$");
