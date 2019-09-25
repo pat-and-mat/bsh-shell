@@ -1,17 +1,18 @@
 #include <string.h>
+#include <stdlib.h>
 
-#include <utils/xmemory.h>
 #include <compiler/token.h>
 
 void token_init(struct token *t, int type, char *lex)
 {
     t->type = type;
-    t->lex = xstring(lex);
+    t->lex = malloc(sizeof(char) * (strlen(lex) + 1));
+    strcpy(t->lex, lex);
 }
 
 void token_free(struct token *t)
 {
-    xfree(t->lex);
+    free(t->lex);
 }
 
 int token_get_type(struct token *t)
