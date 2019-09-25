@@ -6,12 +6,25 @@
 
 #define VECTOR_INIT_CAPACITY 5
 
-void vector_init(struct vector *v, void (*free_item)(void *item))
+void vector_init(struct vector *v, void (*free_item)(void *item), void *(*copy_item)(void *item))
 {
     v->capacity = VECTOR_INIT_CAPACITY;
     v->count = 0;
-    v->items = malloc(sizeof(void *) * v->capacity);
     v->free_item = free_item;
+    v->copy_item = copy_item;
+    v->items = malloc(sizeof(void *) * v->capacity);
+}
+
+struct vector *vector_copy(struct vector *v)
+{
+    struct vector *cpy = malloc(sizeof(struct vector));
+    cpy->capacity = v->capacity;
+    cpy->count = v->count;
+    cpy->free_item = v->free_item;
+    cpy->copy_item = v->copy_item;
+    cpy->items = malloc(sizeof(void *) * cpy->capacity);
+    for (int i = 0; i < v->count; i++)
+        vector_add(cpy, v->items[i]);
 }
 
 int vector_count(struct vector *v)
@@ -29,26 +42,22 @@ static void vector_resize(struct vector *v, int capacity)
     }
 }
 
-void vector_add(struct vector *v, void *item, size_t item_size)
+void vector_add(struct vector *v, void *item)
 {
     if (v->capacity == v->count)
         vector_resize(v, v->capacity * 2);
 
-    void *item_cpy = malloc(item_size);
-    memcpy(item_cpy, item, item_size);
-    v->items[v->count++] = item_cpy;
+    v->items[v->count++] = v->copy_item(item);
 }
 
-void vector_set(struct vector *v, int index, void *item, size_t item_size)
+void vector_set(struct vector *v, int index, void *item)
 {
     if (index >= 0 && index < v->count)
     {
         free(v->items[index]);
         v->items[index] = item;
     }
-    void *item_cpy = malloc(item_size);
-    memcpy(item_cpy, item, item_size);
-    v->items[index] = item_cpy;
+    v->items[index] = v->copy_item(item);
 }
 
 void *vector_get(struct vector *v, int index)

@@ -12,6 +12,7 @@ struct token
 
 void token_init(struct token *t, int type, char *lex);
 void token_free(struct token *t);
+struct token *token_copy(struct token *t);
 int token_get_type(struct token *t);
 char *token_get_lex(struct token *t);
 

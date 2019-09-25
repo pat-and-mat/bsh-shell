@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <utils/strutils.h>
 #include <utils/vector.h>
 #include <compiler/tokenizer.h>
 #include <compiler/token.h>
@@ -12,7 +13,7 @@ void tokenizer_init(struct tokenizer *t, char *text)
     t->text = malloc(sizeof(char) * (strlen(text) + 1));
     strcpy(t->text, text);
     t->tokens = malloc(sizeof(struct vector));
-    vector_init(t->tokens, (void (*)(void *))token_free);
+    vector_init(t->tokens, (void (*)(void *))token_free, (void *(*)(void *))token_copy);
     t->makes_history = 1;
 }
 
@@ -21,6 +22,14 @@ void tokenizer_free(struct tokenizer *t)
     free(t->text);
     vector_free(t->tokens);
     free(t->tokens);
+}
+
+struct tokenizer *tokenizer_copy(struct tokenizer *t)
+{
+    struct tokenizer *cpy = malloc(sizeof(struct tokenizer));
+    cpy->text = str_copy(t->text);
+    cpy->tokens = vector_copy(t->tokens);
+    cpy->makes_history = t->makes_history;
 }
 
 char *tokenizer_get_text(struct tokenizer *t)
@@ -63,7 +72,7 @@ void tokenizer_tokenize(struct tokenizer *t)
         *delim = '\0';
 
         token_init(&token, tokenizer_get_token_type(text), text);
-        vector_add(t->tokens, &token, sizeof(struct token));
+        vector_add(t->tokens, &token);
 
         text = delim + 1;
         while (*text && (*text == ' ')) /* Ignore spaces */
@@ -71,7 +80,7 @@ void tokenizer_tokenize(struct tokenizer *t)
     }
 
     token_init(&token, TOKEN_T_EOF, "$");
-    vector_add(t->tokens, &token, sizeof(struct token));
+    vector_add(t->tokens, &token);
 }
 
 int tokenizer_get_token_type(char *lex)
