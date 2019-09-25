@@ -59,7 +59,7 @@ void tokenizer_tokenize(struct tokenizer *t)
     {
         *delim = '\0';
 
-        token_init(&token, tokenizer_get_token_type(t->text), "$");
+        token_init(&token, tokenizer_get_token_type(t->text), t->text);
         vector_add(t->tokens, &token, sizeof(struct token));
 
         t->text = delim + 1;
