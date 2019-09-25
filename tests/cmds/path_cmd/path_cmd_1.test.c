@@ -11,11 +11,14 @@ int main()
     struct path_cmd p;
     path_cmd_init(&p);
 
-    char *arg1 = "agr1";
+    char *arg1 = "arg1";
     path_cmd_add_arg(&p, arg1);
 
-    if (strcmp("arg1", vector_get(p.args, 0)))
+    printf("%s \n", (char *)vector_get(p.args, 0));
+
+    if (!strcmp("arg1", vector_get(p.args, 0)))
     {
+        path_cmd_free(&p);
         return 0;
     }
 
