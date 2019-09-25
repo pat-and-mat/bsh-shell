@@ -16,7 +16,7 @@ void tokenizer_init(struct tokenizer *t, char *text)
     t->makes_history = 1;
 }
 
-void tokenizer_free(struct tokenizer *t, char *text)
+void tokenizer_free(struct tokenizer *t)
 {
     free(t->text);
     vector_free(t->tokens);
