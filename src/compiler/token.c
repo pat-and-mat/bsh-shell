@@ -6,7 +6,7 @@
 void token_init(struct token *t, int type, char *lex)
 {
     t->type = type;
-    t->lex = malloc(sizeof t->lex);
+    t->lex = xmalloc(sizeof(char) * (strlen(lex) + 1));
     strcpy(t->lex, lex);
 }
 

@@ -6,7 +6,7 @@
 
 void *xmalloc(size_t size)
 {
-    size_t *ptr = malloc(OFFSET + size);
+    size_t *ptr = xmalloc(OFFSET + size);
     *ptr = size;
     return ptr + 1;
 }
@@ -26,7 +26,7 @@ void *xrealloc(void *ptr, size_t size)
 
 void xfree(void *ptr)
 {
-    free((size_t *)ptr - 1);
+    xfree((size_t *)ptr - 1);
 }
 
 size_t xsize_of(void *ptr)
