@@ -20,10 +20,10 @@ int main()
     char *string2 = "$";
     token_init(&t2, TOKEN_T_EOF, string2);
 
-    vector_init(&v, (void (*)(void *))token_free);
+    vector_init(&v, (void (*)(void *))token_free, (void *(*)(void *))token_copy);
 
-    vector_add(&v, &t1, sizeof(t1));
-    vector_add(&v, &t2, sizeof(t2));
+    vector_add(&v, &t1);
+    vector_add(&v, &t2);
 
     parser_init(&p, &v);
 

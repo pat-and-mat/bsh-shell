@@ -28,12 +28,12 @@ int main()
     char *string4 = "$";
     token_init(&t4, TOKEN_T_EOF, string4);
 
-    vector_init(&v, (void (*)(void *))token_free);
+    vector_init(&v, (void (*)(void *))token_free, (void *(*)(void *))token_copy);
 
-    vector_add(&v, &t1, sizeof(t1));
-    vector_add(&v, &t2, sizeof(t2));
-    vector_add(&v, &t3, sizeof(t3));
-    vector_add(&v, &t4, sizeof(t4));
+    vector_add(&v, &t1);
+    vector_add(&v, &t2);
+    vector_add(&v, &t3);
+    vector_add(&v, &t4);
 
     parser_init(&p, &v);
 

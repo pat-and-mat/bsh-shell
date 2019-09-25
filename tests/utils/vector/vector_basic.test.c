@@ -3,25 +3,26 @@
 #include <string.h>
 
 #include <utils/vector.h>
+#include <utils/strutils.h>
 
 int main()
 {
     int i;
 
     struct vector v;
-    vector_init(&v, NULL);
+    vector_init(&v, NULL, (void *(*)(void *))str_copy);
 
     char *s = "Bonjour";
-    vector_add(&v, s, sizeof(char) * (strlen(s) + 1));
+    vector_add(&v, s);
 
     s = "tout";
-    vector_add(&v, s, sizeof(char) * (strlen(s) + 1));
+    vector_add(&v, s);
 
     s = "le";
-    vector_add(&v, s, sizeof(char) * (strlen(s) + 1));
+    vector_add(&v, s);
 
     s = "monde";
-    vector_add(&v, s, sizeof(char) * (strlen(s) + 1));
+    vector_add(&v, s);
 
     for (i = 0; i < vector_count(&v); i++)
         printf("%s ", (char *)vector_get(&v, i));
@@ -32,9 +33,9 @@ int main()
     vector_delete(&v, 1);
 
     s = "Hello";
-    vector_set(&v, 0, s, sizeof(char) * (strlen(s) + 1));
+    vector_set(&v, 0, s);
     s = "World";
-    vector_add(&v, s, sizeof(char) * (strlen(s) + 1));
+    vector_add(&v, s);
 
     for (i = 0; i < vector_count(&v); i++)
         printf("%s ", (char *)vector_get(&v, i));
