@@ -46,7 +46,9 @@ void tokenizer_tokenize(struct tokenizer *t)
     strcpy(text, t->text);
     char *delim; /* Points to first space delimiter */
 
-    text[strlen(text) - 1] = ' '; /* Replace trailing ’\n’ with space */
+    if (text[strlen(text) - 1] == '\n')
+        text[strlen(text) - 1] = ' '; /* Replace trailing ’\n’ with space */
+
     if (*text && (*text == ' '))
     {
         t->makes_history = 0;
