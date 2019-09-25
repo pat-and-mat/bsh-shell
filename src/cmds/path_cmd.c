@@ -10,7 +10,7 @@ void path_cmd_init(struct path_cmd *c)
 {
     cmd_init(&c->base, CMD_T_PATH_CMD, path_cmd_run);
     c->args = malloc(sizeof(struct vector));
-    vector_init(c->args, NULL, (void *(*)(void *))strcpy);
+    vector_init(c->args, NULL, (void *(*)(void *))str_copy);
 }
 
 void path_cmd_free(struct path_cmd *c)
