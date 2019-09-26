@@ -19,6 +19,6 @@ struct cmd *left_cmd_set_left(struct left_cmd *c, struct cmd *left);
 struct cmd *left_cmd_get_right(struct left_cmd *c);
 struct cmd *left_cmd_set_right(struct left_cmd *c, struct cmd *right);
 
-int left_cmd_run(struct cmd *c);
+bool left_cmd_run(struct cmd *c);
 
 #endif
