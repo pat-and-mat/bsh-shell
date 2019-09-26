@@ -25,11 +25,8 @@
 						| 	<job> '&'
 						|	<job>
 
-	<job>			::=		<job1>
+	<job>			::=		<command> '|' <job>
 						|	<command>
-
-	<job1>			::=		'|' <command>
-						|	(EMPTY)
 
 	<command>		::=		<simple command> '<' <filename>
 						|	<simple command> '>' <filename>
