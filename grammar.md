@@ -3,9 +3,7 @@
 ```
 	<command line>	::=  	<job>
 						|	<job> '&'
-						| 	<job> '&' <command line>
 						|	<job> ';'
-						|	<job> ';' <command line>
 
 	<job>			::=		<command>
 						|	< job > '|' < command >
@@ -23,11 +21,9 @@
 ### Removed left recursion and left factoring
 
 ```
-	<command line>	::= 	<job> ';' <command line>
-						|	<job> ';'
-						| 	<job> '&' <command line>
-						|	<job> '&'
-							<job>
+	<command line>	::= 	<job> ';'
+						| 	<job> '&'
+						|	<job>
 
 	<job>			::=		<command> '|' <job>
 						|	<command>
