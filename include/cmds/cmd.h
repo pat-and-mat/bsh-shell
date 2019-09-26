@@ -2,6 +2,7 @@
 #define CMD_H
 
 #define CMD_T_PATH_CMD 1
+#define CMD_T_SEP_CMD 2
 
 struct cmd
 {
