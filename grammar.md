@@ -26,11 +26,11 @@
 	<command line>	::= 	<job> <command line1>
 						|	<job> <command line2>
 
-	<command line1>	::= 	';' <command line1>
+	<command line1>	::= 	';' <command line>
 						| 	';'
 						|	(EMPTY)
 	
-	<command line2>	::= 	'&' <command line1>
+	<command line2>	::= 	'&' <command line>
 						| 	'&'
 						|	(EMPTY)
 
@@ -46,9 +46,10 @@
 						|	'>>' <filename>
 						|	(EMPTY)
 
-	<simple command>::=		<pathname> <token list>
+	<simple command>::=		'cd' <token list>
+						|	<pathname> <token list>
 
-	<token list>	::=		<token> <token list>
-						|	(EMPTY)
+	<token list> ::=	<token> <token list>
+						| (EMPTY)
 ```
 
