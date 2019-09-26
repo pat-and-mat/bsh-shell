@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
 
 #include <compiler/parser.h>
 #include <cmds/path_cmd.h>
@@ -7,7 +8,18 @@
 #include <utils/xmemory.h>
 #include <compiler/token.h>
 
-struct cmd *parser_parse_path_cmd(struct parser *p);
+bool parser_parse_cmd_line(struct parser *p, struct cmd **out);
+bool parser_parse_cmd_line_1(struct parser *p, struct cmd **out, struct cmd *left);
+bool parser_parse_cmd_line_2(struct parser *p, struct cmd **out, struct cmd *left);
+
+bool parser_parse_job(struct parser *p, struct cmd **out);
+bool parser_parse_job1(struct parser *p, struct cmd **out, struct cmd *left);
+
+bool parser_parse_cmd(struct parser *p, struct cmd **out);
+bool parser_parse_cmd_1(struct parser *p, struct cmd **out, struct cmd *left);
+
+bool parser_parse_simple_cmd(struct parser *p, struct cmd **out);
+bool parser_parse_token_list(struct parser *p, struct cmd **out);
 
 struct parser *parser_init(struct vector *tokens)
 {
@@ -34,9 +46,31 @@ void parse_next(struct parser *p)
 
 struct cmd *parser_parse(struct parser *p)
 {
-    return parser_parse_path_cmd(p);
+    struct cmd *cmd;
+    if (parser_parse_cmd_line(p, &cmd))
+        return cmd;
+    return NULL;
 }
 
-struct cmd *parser_parse_path_cmd(struct parser *p)
+bool parser_parse_cmd_line(struct parser *p, struct cmd **out)
+{
+    struct cmd *job, *result;
+    if (!parser_parse_job(p, &job))
+        return false;
+    return parser_parse_cmd_line_1(p, &result, job) || parser_parse_cmd_line_2(p, &result, job);
+}
+
+bool parser_parse_cmd_line_1(struct parser *p, struct cmd **out, struct cmd *left)
 {
 }
+
+bool parser_parse_cmd_line_2(struct parser *p, struct cmd **out, struct cmd *left);
+
+bool parser_parse_job(struct parser *p, struct cmd **out);
+bool parser_parse_job1(struct parser *p, struct cmd **out, struct cmd *left);
+
+bool parser_parse_cmd(struct parser *p, struct cmd **out);
+bool parser_parse_cmd_1(struct parser *p, struct cmd **out, struct cmd *left);
+
+bool parser_parse_simple_cmd(struct parser *p, struct cmd **out);
+bool parser_parse_token_list(struct parser *p, struct cmd **out);

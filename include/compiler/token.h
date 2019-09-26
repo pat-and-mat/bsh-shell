@@ -3,6 +3,7 @@
 
 #define TOKEN_T_EOF -1
 #define TOKEN_T_STR 1
+#define TOKEN_T_SEMICOLON 2
 
 struct token
 {
