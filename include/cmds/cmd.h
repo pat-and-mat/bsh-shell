@@ -1,8 +1,14 @@
 #ifndef CMD_H
 #define CMD_H
 
-#define CMD_T_PATH_CMD 1
-#define CMD_T_SEP_CMD 2
+#define CMD_T_SEP_CMD 1
+#define CMD_T_BG_CMD 2
+#define CMD_T_PIPE_CMD 3
+#define CMD_T_LEFT_CMD 4
+#define CMD_T_RIGHT_CMD 5
+#define CMD_T_RIGHT_APPEND_CMD 6
+#define CMD_T_PATH_CMD 7
+#define CMD_T_CD 8
 
 struct cmd
 {
