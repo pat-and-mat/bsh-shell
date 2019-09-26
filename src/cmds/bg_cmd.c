@@ -1,0 +1,47 @@
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+
+#include <cmds/cmd.h>
+#include <cmds/bg_cmd.h>
+#include <utils/vector.h>
+#include <utils/xmemory.h>
+
+struct bg_cmd *bg_cmd_init()
+{
+    struct bg_cmd *bg_cmd = xmalloc(sizeof(struct bg_cmd));
+    bg_cmd_init_allocated(bg_cmd);
+    return bg_cmd;
+}
+
+void bg_cmd_init_allocated(struct bg_cmd *c)
+{
+    cmd_init_allocated(&c->base, CMD_T_BG_CMD, bg_cmd_run);
+}
+
+struct cmd *bg_cmd_get_left(struct bg_cmd *c)
+{
+    return c->left;
+}
+struct cmd *bg_cmd_set_left(struct bg_cmd *c, struct cmd *left)
+{
+    c->left = left;
+    return c->left;
+}
+
+struct cmd *bg_cmd_get_right(struct bg_cmd *c)
+{
+    return c->right;
+}
+
+struct cmd *bg_cmd_set_right(struct bg_cmd *c, struct cmd *right)
+{
+    c->right = right;
+    return c->right;
+}
+
+bool bg_cmd_run(struct cmd *c)
+{
+    struct bg_cmd *bg_cmd = (struct bg_cmd *)c;
+    return false;
+}

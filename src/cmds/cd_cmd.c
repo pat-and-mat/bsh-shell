@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
 #include <cmds/cmd.h>
 #include <cmds/cd_cmd.h>
@@ -29,8 +30,8 @@ struct cmd *cd_cmd_get_arg(struct cd_cmd *c)
     return c->arg;
 }
 
-int cd_cmd_run(struct cmd *c)
+bool cd_cmd_run(struct cmd *c)
 {
     struct cd_cmd *cd_cmd = (struct cd_cmd *)c;
-    return 0;
+    return false;
 }
