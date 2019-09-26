@@ -3,7 +3,9 @@
 ```
 	<command line>	::=  	<job>
 						|	<job> '&'
+						|	<job> '&' <command line>
 						|	<job> ';'
+						|	<job> ';' <command line>
 
 	<job>			::=		<command>
 						|	<job> '|' <command>
@@ -22,7 +24,9 @@
 
 ```
 	<command line>	::= 	<job> ';'
+						| 	<job> ';' <command line>
 						| 	<job> '&'
+						| 	<job> '&' <command line>
 						|	<job>
 
 	<job>			::=		<command> '|' <job>
