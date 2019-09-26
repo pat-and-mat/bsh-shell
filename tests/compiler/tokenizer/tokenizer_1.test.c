@@ -19,7 +19,7 @@ int main()
     int makes_history = 1;
 
     struct tokenizer t;
-    tokenizer_init(&t, text);
+    tokenizer_init_allocated(&t, text);
 
     tokenizer_tokenize(&t);
 

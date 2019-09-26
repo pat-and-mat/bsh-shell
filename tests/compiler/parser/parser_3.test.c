@@ -20,25 +20,25 @@ int main()
     struct cmd *c;
 
     char *string1 = "rodrigo";
-    token_init(&t1, TOKEN_T_STR, string1);
+    token_init_allocated(&t1, TOKEN_T_STR, string1);
 
     char *string2 = "George";
-    token_init(&t2, TOKEN_T_STR, string2);
+    token_init_allocated(&t2, TOKEN_T_STR, string2);
 
     char *string3 = "Garcia";
-    token_init(&t3, TOKEN_T_STR, string3);
+    token_init_allocated(&t3, TOKEN_T_STR, string3);
 
     char *string4 = "$";
-    token_init(&t4, TOKEN_T_EOF, string4);
+    token_init_allocated(&t4, TOKEN_T_EOF, string4);
 
-    vector_init(&v);
+    vector_init_allocated(&v);
 
     vector_add(&v, &t1);
     vector_add(&v, &t2);
     vector_add(&v, &t3);
     vector_add(&v, &t4);
 
-    parser_init(&p, &v);
+    parser_init_allocated(&p, &v);
 
     c = parser_parse(&p);
 

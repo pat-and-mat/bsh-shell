@@ -10,7 +10,8 @@ struct token
     char *lex;
 };
 
-void token_init(struct token *t, int type, char *lex);
+struct token *token_init(int type, char *lex);
+void token_init_allocated(struct token *t, int type, char *lex);
 int token_get_type(struct token *t);
 char *token_get_lex(struct token *t);
 

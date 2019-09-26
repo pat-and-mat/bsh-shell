@@ -8,7 +8,8 @@ struct vector
     int count;
 };
 
-void vector_init(struct vector *);
+struct vector *vector_init();
+void vector_init_allocated(struct vector *);
 int vector_count(struct vector *);
 static void vector_resize(struct vector *, int);
 void vector_add(struct vector *, void *);

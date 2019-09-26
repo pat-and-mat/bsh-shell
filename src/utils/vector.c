@@ -7,7 +7,14 @@
 
 #define VECTOR_INIT_CAPACITY 5
 
-void vector_init(struct vector *v)
+struct vector *vector_init()
+{
+    struct vector *v = xmalloc(sizeof(struct vector));
+    vector_init_allocated(v);
+    return v;
+}
+
+void vector_init_allocated(struct vector *v)
 {
     v->capacity = VECTOR_INIT_CAPACITY;
     v->count = 0;

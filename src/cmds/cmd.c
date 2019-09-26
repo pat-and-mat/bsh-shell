@@ -1,7 +1,7 @@
 #include <cmds/cmd.h>
 #include <stdio.h>
 
-void cmd_init(struct cmd *c, int type, int (*run)(struct cmd *c))
+void cmd_init_allocated(struct cmd *c, int type, int (*run)(struct cmd *c))
 {
     c->type = type;
     c->run = run;

@@ -11,26 +11,13 @@ int main()
 {
     xmem_init();
 
-    struct token t1;
-    struct token t2;
-    struct parser p;
-    struct vector v;
-    struct cmd *c;
+    struct vector *v = vector_init();
 
-    char *string1 = "rodrigo";
-    token_init(&t1, TOKEN_T_STR, string1);
+    vector_add(v, token_init(TOKEN_T_STR, "rodrigo"));
+    vector_add(v, token_init(TOKEN_T_EOF, "$"));
 
-    char *string2 = "$";
-    token_init(&t2, TOKEN_T_EOF, string2);
-
-    vector_init(&v);
-
-    vector_add(&v, &t1);
-    vector_add(&v, &t2);
-
-    parser_init(&p, &v);
-
-    c = parser_parse(&p);
+    struct parser *p = parser_init(v);
+    struct cmd *c = parser_parse(p);
 
     if (c->type != CMD_T_PATH_CMD)
     {

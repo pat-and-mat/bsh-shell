@@ -12,7 +12,7 @@ int main()
     int i;
 
     struct vector v;
-    vector_init(&v);
+    vector_init_allocated(&v);
 
     char *s = "Bonjour";
     vector_add(&v, s);

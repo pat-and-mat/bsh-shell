@@ -18,17 +18,17 @@ int main()
     struct cmd *c;
 
     char *string1 = "rodrigo";
-    token_init(&t1, TOKEN_T_STR, string1);
+    token_init_allocated(&t1, TOKEN_T_STR, string1);
 
     char *string2 = "$";
-    token_init(&t2, TOKEN_T_EOF, string2);
+    token_init_allocated(&t2, TOKEN_T_EOF, string2);
 
-    vector_init(&v);
+    vector_init_allocated(&v);
 
     vector_add(&v, &t1);
     vector_add(&v, &t2);
 
-    parser_init(&p, &v);
+    parser_init_allocated(&p, &v);
 
     c = parser_parse(&p);
 

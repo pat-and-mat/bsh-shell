@@ -12,7 +12,7 @@ int main()
     struct token t;
     char *str = "ls";
 
-    token_init(&t, TOKEN_T_STR, str);
+    token_init_allocated(&t, TOKEN_T_STR, str);
 
     xmem_free();
     return 0;

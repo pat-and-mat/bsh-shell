@@ -11,13 +11,12 @@ int main()
 {
     xmem_init();
 
-    struct path_cmd p;
-    path_cmd_init(&p);
+    struct path_cmd *p = path_cmd_init();
 
     char *arg1 = "arg1";
-    path_cmd_add_arg(&p, arg1);
+    path_cmd_add_arg(p, arg1);
 
-    if (!strcmp("arg1", vector_get(p.args, 0)))
+    if (!strcmp("arg1", vector_get(p->args, 0)))
     {
         xmem_free();
         return 0;

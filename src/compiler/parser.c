@@ -7,9 +7,16 @@
 #include <utils/xmemory.h>
 #include <compiler/token.h>
 
-struct path_cmd *parser_parse_path_cmd(struct parser *p);
+struct cmd *parser_parse_path_cmd(struct parser *p);
 
-void parser_init(struct parser *p, struct vector *tokens)
+struct parser *parser_init(struct vector *tokens)
+{
+    struct parser *parser = xmalloc(sizeof(struct parser));
+    parser_init_allocated(parser, tokens);
+    return parser;
+}
+
+void parser_init_allocated(struct parser *p, struct vector *tokens)
 {
     p->i = 0;
     p->tokens = tokens;
@@ -27,13 +34,12 @@ void parse_next(struct parser *p)
 
 struct cmd *parser_parse(struct parser *p)
 {
-    return (struct cmd *)parser_parse_path_cmd(p);
+    return parser_parse_path_cmd(p);
 }
 
-struct path_cmd *parser_parse_path_cmd(struct parser *p)
+struct cmd *parser_parse_path_cmd(struct parser *p)
 {
-    struct path_cmd *path_cmd = xmalloc(sizeof(struct path_cmd));
-    path_cmd_init(path_cmd);
+    struct path_cmd *path_cmd = path_cmd_init();
 
     struct token *t = parser_lookahead(p);
     while (token_get_type(t) == TOKEN_T_STR)
@@ -44,5 +50,5 @@ struct path_cmd *parser_parse_path_cmd(struct parser *p)
         t = parser_lookahead(p);
     }
 
-    return path_cmd;
+    return (struct cmd *)path_cmd;
 }

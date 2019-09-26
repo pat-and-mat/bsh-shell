@@ -10,7 +10,8 @@ struct tokenizer
     int makes_history;
 };
 
-void tokenizer_init(struct tokenizer *t, char *text);
+struct tokenizer *tokenizer_init(char *text);
+void tokenizer_init_allocated(struct tokenizer *t, char *text);
 
 char *tokenizer_get_text(struct tokenizer *t);
 struct vector *tokenizer_get_tokens(struct tokenizer *t);

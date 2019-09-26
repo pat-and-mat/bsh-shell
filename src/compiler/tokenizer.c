@@ -8,12 +8,18 @@
 
 int tokenizer_get_token_type(char *lex);
 
-void tokenizer_init(struct tokenizer *t, char *text)
+struct tokenizer *tokenizer_init(char *text)
+{
+    struct tokenizer *t = xmalloc(sizeof(struct tokenizer));
+    tokenizer_init_allocated(t, text);
+    return t;
+}
+
+void tokenizer_init_allocated(struct tokenizer *t, char *text)
 {
     t->text = xmalloc(sizeof(char) * (strlen(text) + 1));
     strcpy(t->text, text);
-    t->tokens = xmalloc(sizeof(struct vector));
-    vector_init(t->tokens);
+    t->tokens = vector_init();
     t->makes_history = 1;
 }
 
@@ -51,23 +57,18 @@ void tokenizer_tokenize(struct tokenizer *t)
     }
 
     struct token *token;
-    /* Build the argv list */
     while ((delim = strchr(text, ' ')))
     {
         *delim = '\0';
 
-        token = xmalloc(sizeof(struct token));
-        token_init(token, tokenizer_get_token_type(text), text);
-        vector_add(t->tokens, token);
+        vector_add(t->tokens, token_init(tokenizer_get_token_type(text), text));
 
         text = delim + 1;
         while (*text && (*text == ' ')) /* Ignore spaces */
             text++;
     }
 
-    token = xmalloc(sizeof(struct token));
-    token_init(token, TOKEN_T_EOF, "$");
-    vector_add(t->tokens, token);
+    vector_add(t->tokens, token_init(TOKEN_T_EOF, "$"));
 }
 
 int tokenizer_get_token_type(char *lex)
