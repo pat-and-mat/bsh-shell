@@ -18,7 +18,7 @@ void xmem_init()
 {
     xmemory.capacity = XMEM_INIT_CAPACITY;
     xmemory.count = 0;
-    xmemory.addrs = xmalloc(sizeof(void *) * XMEM_INIT_CAPACITY);
+    xmemory.addrs = malloc(sizeof(void *) * XMEM_INIT_CAPACITY);
 }
 
 void xmem_free()
@@ -32,7 +32,7 @@ void *xmalloc(size_t size)
 {
     if (xmemory.capacity == xmemory.count)
         xmem_resize();
-    return xmemory.addrs[xmemory.count++] = xmalloc(size);
+    return xmemory.addrs[xmemory.count++] = malloc(size);
 }
 
 void *xrealloc(void *ptr, size_t size)
