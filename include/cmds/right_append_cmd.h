@@ -19,6 +19,6 @@ struct cmd *right_append_cmd_set_left(struct right_append_cmd *c, struct cmd *le
 struct cmd *right_append_cmd_get_right(struct right_append_cmd *c);
 struct cmd *right_append_cmd_set_right(struct right_append_cmd *c, struct cmd *right);
 
-int right_append_cmd_run(struct cmd *c);
+bool right_append_cmd_run(struct cmd *c);
 
 #endif
