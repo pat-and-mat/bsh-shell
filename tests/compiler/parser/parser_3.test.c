@@ -28,7 +28,7 @@ int main()
     char *string4 = "$";
     token_init(&t4, TOKEN_T_EOF, string4);
 
-    vector_init(&v, (void (*)(void *))token_free, (void *(*)(void *))token_copy);
+    vector_init(&v);
 
     vector_add(&v, &t1);
     vector_add(&v, &t2);

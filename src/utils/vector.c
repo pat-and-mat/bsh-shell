@@ -3,29 +3,15 @@
 #include <string.h>
 
 #include <utils/vector.h>
+#include <utils/xmemory.h>
 
 #define VECTOR_INIT_CAPACITY 5
 
-void vector_init(struct vector *v, void (*free_item)(void *item), void *(*copy_item)(void *item))
+void vector_init(struct vector *v)
 {
     v->capacity = VECTOR_INIT_CAPACITY;
     v->count = 0;
-    v->free_item = free_item;
-    v->copy_item = copy_item;
-    v->items = malloc(sizeof(void *) * v->capacity);
-}
-
-struct vector *vector_copy(struct vector *v)
-{
-    struct vector *cpy = malloc(sizeof(struct vector));
-    cpy->capacity = v->capacity;
-    cpy->count = 0;
-    cpy->free_item = v->free_item;
-    cpy->copy_item = v->copy_item;
-    cpy->items = malloc(sizeof(void *) * cpy->capacity);
-    for (int i = 0; i < v->count; i++)
-        vector_add(cpy, v->items[i]);
-    return cpy;
+    v->items = xmalloc(sizeof(void *) * v->capacity);
 }
 
 int vector_count(struct vector *v)
@@ -35,7 +21,7 @@ int vector_count(struct vector *v)
 
 static void vector_resize(struct vector *v, int capacity)
 {
-    void **items = realloc(v->items, sizeof(void *) * capacity);
+    void **items = xrealloc(v->items, sizeof(void *) * capacity);
     if (items)
     {
         v->items = items;
@@ -48,7 +34,7 @@ void vector_add(struct vector *v, void *item)
     if (v->capacity == v->count)
         vector_resize(v, v->capacity * 2);
 
-    v->items[v->count++] = (*v->copy_item)(item);
+    v->items[v->count++] = item;
 }
 
 void vector_set(struct vector *v, int index, void *item)
@@ -58,7 +44,7 @@ void vector_set(struct vector *v, int index, void *item)
         free(v->items[index]);
         v->items[index] = item;
     }
-    v->items[index] = (*v->copy_item)(item);
+    v->items[index] = item;
 }
 
 void *vector_get(struct vector *v, int index)
@@ -73,9 +59,6 @@ void vector_delete(struct vector *v, int index)
     if (index < 0 || index >= v->count)
         return;
 
-    if (v->free_item != NULL)
-        (*v->free_item)(v->items[index]);
-    free(v->items[index]);
     v->items[index] = NULL;
 
     for (int i = index; i < v->count - 1; i++)
@@ -88,16 +71,4 @@ void vector_delete(struct vector *v, int index)
 
     if (v->count > 0 && v->count == v->capacity / 4)
         vector_resize(v, v->capacity / 2);
-}
-
-void vector_free(struct vector *v)
-{
-    for (int i = 0; i < v->count; i++)
-    {
-        if (v->free_item != NULL)
-            (*v->free_item)(v->items[i]);
-        free(v->items[i]);
-        v->items[i] = NULL;
-    }
-    free(v->items);
 }
