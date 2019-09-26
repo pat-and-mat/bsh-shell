@@ -6,7 +6,7 @@
 						|	<job> ';'
 
 	<job>			::=		<command>
-						|	< job > '|' < command >
+						|	<job> '|' <command>
 
 	<command>		::=		<simple command>
 						|	<simple command> '<' <filename>
@@ -25,11 +25,15 @@
 						| 	<job> '&'
 						|	<job>
 
-	<job>			::=		<command> '|' <job>
+	<job>			::=		<job1>
 						|	<command>
+
+	<job1>			::=		'|' <command>
+						|	(EMPTY)
 
 	<command>		::=		<simple command> '<' <filename>
 						|	<simple command> '>' <filename>
+						|	<simple command> '>>' <filename>
 						|	<simple command>
 
 	<simple command>::=		<pathname> <token list>
