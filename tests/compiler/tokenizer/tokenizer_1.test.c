@@ -4,9 +4,11 @@
 #include <compiler/token.h>
 #include <compiler/tokenizer.h>
 #include <utils/vector.h>
+#include <utils/xmemory.h>
 
 int main()
 {
+    xmem_init();
 
     char *text = "ls -l\n";
 
@@ -28,11 +30,18 @@ int main()
     {
         token = vector_get(tokens, i);
         if (token->type != tokens_res[i].type || strcmp(token->lex, tokens_res[i].lex) != 0)
+        {
+            xmem_free();
             return -1;
+        }
     }
 
     if (tokenizer_get_makes_history(&t) != makes_history)
+    {
+        xmem_free();
         return -1;
+    }
 
+    xmem_free();
     return 0;
 }
