@@ -5,6 +5,7 @@
 #include <cmds/cmd.h>
 #include <cmds/path_cmd.h>
 #include <utils/vector.h>
+#include <utils/xmemory.h>
 
 int main()
 {
@@ -16,7 +17,6 @@ int main()
 
     if (!strcmp("arg1", vector_get(p.args, 0)))
     {
-        path_cmd_free(&p);
         return 0;
     }
 

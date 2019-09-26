@@ -3,14 +3,13 @@
 #include <string.h>
 
 #include <utils/vector.h>
-#include <utils/strutils.h>
 
 int main()
 {
     int i;
 
     struct vector v;
-    vector_init(&v, NULL, (void *(*)(void *))str_copy);
+    vector_init(&v);
 
     char *s = "Bonjour";
     vector_add(&v, s);
@@ -40,6 +39,4 @@ int main()
     for (i = 0; i < vector_count(&v); i++)
         printf("%s ", (char *)vector_get(&v, i));
     printf("\n");
-
-    vector_free(&v);
 }

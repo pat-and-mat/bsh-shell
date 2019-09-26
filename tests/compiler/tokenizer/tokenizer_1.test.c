@@ -21,9 +21,6 @@ int main()
 
     tokenizer_tokenize(&t);
 
-    tokenizer_free(&t);
-    return 0;
-
     struct vector *tokens = tokenizer_get_tokens(&t);
 
     struct token *token;
@@ -37,6 +34,5 @@ int main()
     if (tokenizer_get_makes_history(&t) != makes_history)
         return -1;
 
-    tokenizer_free(&t);
     return 0;
 }

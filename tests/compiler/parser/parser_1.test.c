@@ -20,7 +20,7 @@ int main()
     char *string2 = "$";
     token_init(&t2, TOKEN_T_EOF, string2);
 
-    vector_init(&v, (void (*)(void *))token_free, (void *(*)(void *))token_copy);
+    vector_init(&v);
 
     vector_add(&v, &t1);
     vector_add(&v, &t2);
