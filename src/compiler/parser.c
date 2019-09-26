@@ -7,7 +7,7 @@
 #include <utils/xmemory.h>
 #include <compiler/token.h>
 
-struct path_cmd *parser_parse_path_cmd(struct parser *p);
+struct cmd *parser_parse_path_cmd(struct parser *p);
 
 struct parser *parser_init(struct vector *tokens)
 {
@@ -37,18 +37,6 @@ struct cmd *parser_parse(struct parser *p)
     return parser_parse_path_cmd(p);
 }
 
-struct path_cmd *parser_parse_path_cmd(struct parser *p)
+struct cmd *parser_parse_path_cmd(struct parser *p)
 {
-    struct path_cmd *path_cmd = path_cmd_init();
-
-    struct token *t = parser_lookahead(p);
-    while (token_get_type(t) == TOKEN_T_STR)
-    {
-        path_cmd_add_arg(path_cmd, token_get_lex(t));
-
-        parse_next(p);
-        t = parser_lookahead(p);
-    }
-
-    return (struct cmd *)path_cmd;
 }
