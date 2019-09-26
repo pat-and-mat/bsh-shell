@@ -31,6 +31,7 @@ int main()
 
     if (5 == vector_count(p.args))
     {
+        xmem_free();
         return 0;
     }
 

@@ -50,22 +50,24 @@ void tokenizer_tokenize(struct tokenizer *t)
             text++;
     }
 
-    struct token token;
+    struct token *token;
     /* Build the argv list */
     while ((delim = strchr(text, ' ')))
     {
         *delim = '\0';
 
-        token_init(&token, tokenizer_get_token_type(text), text);
-        vector_add(t->tokens, &token);
+        token = xmalloc(sizeof(struct token));
+        token_init(token, tokenizer_get_token_type(text), text);
+        vector_add(t->tokens, token);
 
         text = delim + 1;
         while (*text && (*text == ' ')) /* Ignore spaces */
             text++;
     }
 
-    token_init(&token, TOKEN_T_EOF, "$");
-    vector_add(t->tokens, &token);
+    token = xmalloc(sizeof(struct token));
+    token_init(token, TOKEN_T_EOF, "$");
+    vector_add(t->tokens, token);
 }
 
 int tokenizer_get_token_type(char *lex)
