@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
 #include <cmds/cmd.h>
 #include <cmds/path_cmd.h>
@@ -24,8 +25,8 @@ void path_cmd_add_arg(struct path_cmd *c, char *arg)
     vector_add(c->args, arg);
 }
 
-int path_cmd_run(struct cmd *c)
+bool path_cmd_run(struct cmd *c)
 {
     struct path_cmd *path_cmd = (struct path_cmd *)c;
-    return 0;
+    return false;
 }
