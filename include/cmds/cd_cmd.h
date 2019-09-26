@@ -6,18 +6,14 @@
 struct cd_cmd
 {
     struct cmd base;
-    struct cmd *left;
-    struct cmd *right;
+    char *arg;
 };
 
 struct cd_cmd *cd_cmd_init();
 void cd_cmd_init_allocated(struct cd_cmd *c);
 
-struct cmd *cd_cmd_get_left(struct cd_cmd *c);
-struct cmd *cd_cmd_set_left(struct cd_cmd *c, struct cmd *left);
-
-struct cmd *cd_cmd_get_right(struct cd_cmd *c);
-struct cmd *cd_cmd_set_right(struct cd_cmd *c, struct cmd *right);
+struct cmd *cd_cmd_get_arg(struct cd_cmd *c);
+struct cmd *cd_cmd_set_arg(struct cd_cmd *c, char *arg);
 
 int cd_cmd_run(struct cmd *c);
 
