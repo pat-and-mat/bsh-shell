@@ -5,9 +5,12 @@
 #include <cmds/path_cmd.h>
 #include <utils/vector.h>
 #include <compiler/token.h>
+#include <utils/xmemory.h>
 
 int main()
 {
+    xmem_init();
+
     struct token t1;
     struct token t2;
     struct parser p;
@@ -31,8 +34,10 @@ int main()
 
     if (c->type != CMD_T_PATH_CMD)
     {
+        xmem_free();
         return -1;
     }
 
+    xmem_free();
     return 0;
 }

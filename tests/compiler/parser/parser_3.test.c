@@ -5,9 +5,12 @@
 #include <cmds/path_cmd.h>
 #include <utils/vector.h>
 #include <compiler/token.h>
+#include <utils/xmemory.h>
 
 int main()
 {
+    xmem_init();
+
     struct token t1;
     struct token t2;
     struct token t3;
@@ -47,8 +50,10 @@ int main()
 
     if (!strcmp(tok1, "rodrigo") && !strcmp(tok2, "George") && !strcmp(tok3, "Garcia"))
     {
+        xmem_free();
         return 0;
     }
 
+    xmem_free();
     return -1;
 }

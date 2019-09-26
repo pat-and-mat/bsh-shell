@@ -3,9 +3,11 @@
 #include <string.h>
 
 #include <compiler/token.h>
+#include <utils/xmemory.h>
 
 int main()
 {
+    xmem_init();
     struct token t;
     char *str = "ls";
 
@@ -20,8 +22,10 @@ int main()
 
     if (strcmp(token_get_lex(&t), str2))
     {
+        xmem_free();
         return -1;
     }
 
+    xmem_free();
     return 0;
 }

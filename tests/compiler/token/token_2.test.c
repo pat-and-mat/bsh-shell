@@ -3,9 +3,12 @@
 #include <string.h>
 
 #include <compiler/token.h>
+#include <utils/xmemory.h>
 
 int main()
 {
+    xmem_init();
+
     struct token t;
     char *str = "ls";
 
@@ -13,8 +16,10 @@ int main()
 
     if (token_get_type(&t) != 1)
     {
+        xmem_free();
         return -1;
     }
 
+    xmem_free();
     return 0;
 }

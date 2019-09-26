@@ -5,9 +5,12 @@
 #include <cmds/cmd.h>
 #include <cmds/path_cmd.h>
 #include <utils/vector.h>
+#include <utils/xmemory.h>
 
 int main()
 {
+    xmem_init();
+
     struct path_cmd p;
     path_cmd_init(&p);
 
@@ -31,5 +34,6 @@ int main()
         return 0;
     }
 
+    xmem_free();
     return -1;
 }
