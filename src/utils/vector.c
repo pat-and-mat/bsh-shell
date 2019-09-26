@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include <utils/vector.h>
+#include <utils/xmemory.h>
 
 #define VECTOR_INIT_CAPACITY 5
 

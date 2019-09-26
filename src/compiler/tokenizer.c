@@ -2,6 +2,7 @@
 #include <string.h>
 
 #include <utils/vector.h>
+#include <utils/xmemory.h>
 #include <compiler/tokenizer.h>
 #include <compiler/token.h>
 
