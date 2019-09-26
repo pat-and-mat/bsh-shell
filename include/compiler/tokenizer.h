@@ -11,8 +11,6 @@ struct tokenizer
 };
 
 void tokenizer_init(struct tokenizer *t, char *text);
-void tokenizer_free(struct tokenizer *t);
-struct tokenizer *tokenizer_copy(struct tokenizer *t);
 
 char *tokenizer_get_text(struct tokenizer *t);
 struct vector *tokenizer_get_tokens(struct tokenizer *t);

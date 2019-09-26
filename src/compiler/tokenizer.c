@@ -1,7 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <utils/strutils.h>
 #include <utils/vector.h>
 #include <compiler/tokenizer.h>
 #include <compiler/token.h>
@@ -10,26 +9,11 @@ int tokenizer_get_token_type(char *lex);
 
 void tokenizer_init(struct tokenizer *t, char *text)
 {
-    t->text = malloc(sizeof(char) * (strlen(text) + 1));
+    t->text = xmalloc(sizeof(char) * (strlen(text) + 1));
     strcpy(t->text, text);
-    t->tokens = malloc(sizeof(struct vector));
-    vector_init(t->tokens, (void (*)(void *))token_free, (void *(*)(void *))token_copy);
+    t->tokens = xmalloc(sizeof(struct vector));
+    vector_init(t->tokens);
     t->makes_history = 1;
-}
-
-void tokenizer_free(struct tokenizer *t)
-{
-    free(t->text);
-    vector_free(t->tokens);
-    free(t->tokens);
-}
-
-struct tokenizer *tokenizer_copy(struct tokenizer *t)
-{
-    struct tokenizer *cpy = malloc(sizeof(struct tokenizer));
-    cpy->text = str_copy(t->text);
-    cpy->tokens = vector_copy(t->tokens);
-    cpy->makes_history = t->makes_history;
 }
 
 char *tokenizer_get_text(struct tokenizer *t)
