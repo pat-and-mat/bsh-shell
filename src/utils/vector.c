@@ -40,10 +40,7 @@ void vector_add(struct vector *v, void *item)
 void vector_set(struct vector *v, int index, void *item)
 {
     if (index >= 0 && index < v->count)
-    {
-        free(v->items[index]);
         v->items[index] = item;
-    }
     v->items[index] = item;
 }
 

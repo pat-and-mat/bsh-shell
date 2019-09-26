@@ -3,9 +3,12 @@
 #include <string.h>
 
 #include <utils/vector.h>
+#include <utils/xmemory.h>
 
 int main()
 {
+    xmem_init();
+
     int i;
 
     struct vector v;
@@ -39,4 +42,7 @@ int main()
     for (i = 0; i < vector_count(&v); i++)
         printf("%s ", (char *)vector_get(&v, i));
     printf("\n");
+
+    xmem_free();
+    return 0;
 }
