@@ -46,9 +46,10 @@
 						|	'>>' <filename>
 						|	(EMPTY)
 
-	<simple command>::=		<pathname> <token list>
+	<simple command>::=		'cd' <token list>
+						|	<pathname> <token list>
 
-	<token list>	::=		<token> <token list>
-						|	(EMPTY)
+	<token list> ::=	<token> <token list>
+						| (EMPTY)
 ```
 
