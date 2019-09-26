@@ -26,11 +26,11 @@
 	<command line>	::= 	<job> <command line1>
 						|	<job> <command line2>
 
-	<command line1>	::= 	';' <command line1>
+	<command line1>	::= 	';' <command line>
 						| 	';'
 						|	(EMPTY)
 	
-	<command line2>	::= 	'&' <command line1>
+	<command line2>	::= 	'&' <command line>
 						| 	'&'
 						|	(EMPTY)
 
