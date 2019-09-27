@@ -16,7 +16,7 @@ struct cd_cmd *cd_cmd_init()
 
 void cd_cmd_init_allocated(struct cd_cmd *c)
 {
-    cmd_init_allocated(&c->base, CMD_T_CD, cd_cmd_run);
+    cmd_init_allocated(&c->base, CMD_T_CD, cd_cmd_run, cd_cmd_print);
     c->arg = NULL;
 }
 
@@ -34,4 +34,8 @@ bool cd_cmd_run(struct cmd *c)
 {
     struct cd_cmd *cd_cmd = (struct cd_cmd *)c;
     return false;
+}
+
+void cd_cmd_print(struct cmd *c, int depth)
+{
 }

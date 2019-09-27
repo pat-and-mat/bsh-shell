@@ -16,7 +16,7 @@ struct left_cmd *left_cmd_init()
 
 void left_cmd_init_allocated(struct left_cmd *c)
 {
-    cmd_init_allocated(&c->base, CMD_T_LEFT_CMD, left_cmd_run);
+    cmd_init_allocated(&c->base, CMD_T_LEFT_CMD, left_cmd_run, left_cmd_print);
     c->cmd = NULL;
     c->filename = NULL;
 }
@@ -44,4 +44,8 @@ bool left_cmd_run(struct cmd *c)
 {
     struct left_cmd *left_cmd = (struct left_cmd *)c;
     return false;
+}
+
+void left_cmd_print(struct cmd *c, int depth)
+{
 }

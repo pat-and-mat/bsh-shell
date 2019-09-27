@@ -16,7 +16,7 @@ struct sep_cmd *sep_cmd_init()
 
 void sep_cmd_init_allocated(struct sep_cmd *c)
 {
-    cmd_init_allocated(&c->base, CMD_T_SEP_CMD, sep_cmd_run);
+    cmd_init_allocated(&c->base, CMD_T_SEP_CMD, sep_cmd_run, sep_cmd_print);
     c->left = NULL;
     c->right = NULL;
 }
@@ -45,4 +45,8 @@ bool sep_cmd_run(struct cmd *c)
 {
     struct sep_cmd *sep_cmd = (struct sep_cmd *)c;
     return false;
+}
+
+void sep_cmd_print(struct cmd *c, int depth)
+{
 }

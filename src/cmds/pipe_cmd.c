@@ -16,7 +16,7 @@ struct pipe_cmd *pipe_cmd_init()
 
 void pipe_cmd_init_allocated(struct pipe_cmd *c)
 {
-    cmd_init_allocated(&c->base, CMD_T_PIPE_CMD, pipe_cmd_run);
+    cmd_init_allocated(&c->base, CMD_T_PIPE_CMD, pipe_cmd_run, pipe_cmd_print);
     c->left = NULL;
     c->right = NULL;
 }
@@ -44,4 +44,8 @@ bool pipe_cmd_run(struct cmd *c)
 {
     struct pipe_cmd *pipe_cmd = (struct pipe_cmd *)c;
     return false;
+}
+
+void pipe_cmd_print(struct cmd *c, int depth)
+{
 }

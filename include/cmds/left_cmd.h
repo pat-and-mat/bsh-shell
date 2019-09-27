@@ -20,5 +20,6 @@ char *left_cmd_get_filename(struct left_cmd *c);
 void left_cmd_set_filename(struct left_cmd *c, char *filename);
 
 bool left_cmd_run(struct cmd *c);
+void left_cmd_print(struct cmd *c, int depth);
 
 #endif

@@ -16,7 +16,7 @@ struct right_append_cmd *right_append_cmd_init()
 
 void right_append_cmd_init_allocated(struct right_append_cmd *c)
 {
-    cmd_init_allocated(&c->base, CMD_T_RIGHT_APPEND_CMD, right_append_cmd_run);
+    cmd_init_allocated(&c->base, CMD_T_RIGHT_APPEND_CMD, right_append_cmd_run, right_append_cmd_print);
     c->cmd = NULL;
     c->filename = NULL;
 }
@@ -44,4 +44,8 @@ bool right_append_cmd_run(struct cmd *c)
 {
     struct right_append_cmd *right_append_cmd = (struct right_append_cmd *)c;
     return false;
+}
+
+void right_append_cmd_print(struct cmd *c, int depth)
+{
 }

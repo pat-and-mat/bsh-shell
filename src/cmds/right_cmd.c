@@ -16,7 +16,7 @@ struct right_cmd *right_cmd_init()
 
 void right_cmd_init_allocated(struct right_cmd *c)
 {
-    cmd_init_allocated(&c->base, CMD_T_RIGHT_CMD, right_cmd_run);
+    cmd_init_allocated(&c->base, CMD_T_RIGHT_CMD, right_cmd_run, right_cmd_print);
     c->cmd = NULL;
     c->filename = NULL;
 }
@@ -45,4 +45,8 @@ bool right_cmd_run(struct cmd *c)
 {
     struct right_cmd *right_cmd = (struct right_cmd *)c;
     return false;
+}
+
+void right_cmd_print(struct cmd *c, int depth)
+{
 }

@@ -16,7 +16,7 @@ struct path_cmd *path_cmd_init()
 
 void path_cmd_init_allocated(struct path_cmd *c)
 {
-    cmd_init_allocated(&c->base, CMD_T_PATH_CMD, path_cmd_run);
+    cmd_init_allocated(&c->base, CMD_T_PATH_CMD, path_cmd_run, path_cmd_print);
     c->args = vector_init();
 }
 
@@ -29,4 +29,8 @@ bool path_cmd_run(struct cmd *c)
 {
     struct path_cmd *path_cmd = (struct path_cmd *)c;
     return false;
+}
+
+void path_cmd_print(struct cmd *c, int depth)
+{
 }

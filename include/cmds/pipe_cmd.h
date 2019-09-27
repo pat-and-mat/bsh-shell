@@ -20,5 +20,6 @@ struct cmd *pipe_cmd_get_right(struct pipe_cmd *c);
 void pipe_cmd_set_right(struct pipe_cmd *c, struct cmd *right);
 
 bool pipe_cmd_run(struct cmd *c);
+void pipe_cmd_print(struct cmd *c, int depth);
 
 #endif
