@@ -6,18 +6,18 @@
 struct right_cmd
 {
     struct cmd base;
-    struct cmd *left;
-    struct cmd *right;
+    struct cmd *cmd;
+    char *filename;
 };
 
 struct right_cmd *right_cmd_init();
 void right_cmd_init_allocated(struct right_cmd *c);
 
-struct cmd *right_cmd_get_left(struct right_cmd *c);
-struct cmd *right_cmd_set_left(struct right_cmd *c, struct cmd *left);
+struct cmd *right_cmd_get_cmd(struct right_cmd *c);
+void right_cmd_set_cmd(struct right_cmd *c, struct cmd *cmd);
 
-struct cmd *right_cmd_get_right(struct right_cmd *c);
-struct cmd *right_cmd_set_right(struct right_cmd *c, struct cmd *right);
+char *right_cmd_get_filename(struct right_cmd *c);
+void right_cmd_set_filename(struct right_cmd *c, char *filename);
 
 int right_cmd_run(struct cmd *c);
 

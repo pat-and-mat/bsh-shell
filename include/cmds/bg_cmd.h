@@ -14,10 +14,10 @@ struct bg_cmd *bg_cmd_init();
 void bg_cmd_init_allocated(struct bg_cmd *c);
 
 struct cmd *bg_cmd_get_left(struct bg_cmd *c);
-struct cmd *bg_cmd_set_left(struct bg_cmd *c, struct cmd *left);
+void bg_cmd_set_left(struct bg_cmd *c, struct cmd *left);
 
 struct cmd *bg_cmd_get_right(struct bg_cmd *c);
-struct cmd *bg_cmd_set_right(struct bg_cmd *c, struct cmd *right);
+void *bg_cmd_set_right(struct bg_cmd *c, struct cmd *right);
 
 int bg_cmd_run(struct cmd *c);
 
