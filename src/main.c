@@ -38,6 +38,7 @@ int main(int argc, char *argv[])
 
         struct cmd *cmd = parser_get_cmd(parser);
         cmd_run(cmd);
+        printf("\n");
 
         free(line);
         xmem_free();

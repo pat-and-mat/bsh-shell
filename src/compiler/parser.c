@@ -284,7 +284,10 @@ bool parser_parse_cd_cmd(struct parser *p, struct cmd **out)
 
     token = parser_lookahead(p);
     if (token_get_type(token) == TOKEN_T_STR)
+    {
         cd_cmd_set_arg(cd_cmd, token_get_lex(token));
+        parser_next(p);
+    }
 
     *out = (struct cmd *)cd_cmd;
     return true;
