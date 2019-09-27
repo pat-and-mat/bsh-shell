@@ -17,27 +17,28 @@ struct right_cmd *right_cmd_init()
 void right_cmd_init_allocated(struct right_cmd *c)
 {
     cmd_init_allocated(&c->base, CMD_T_RIGHT_CMD, right_cmd_run);
+    c->cmd = NULL;
+    c->filename = NULL;
 }
 
-struct cmd *right_cmd_get_left(struct right_cmd *c)
+struct cmd *right_cmd_get_cmd(struct right_cmd *c)
 {
-    return c->left;
-}
-struct cmd *right_cmd_set_left(struct right_cmd *c, struct cmd *left)
-{
-    c->left = left;
-    return c->left;
+    return c->cmd;
 }
 
-struct cmd *right_cmd_get_right(struct right_cmd *c)
+void right_cmd_set_cmd(struct right_cmd *c, struct cmd *cmd)
 {
-    return c->right;
+    c->cmd = cmd;
 }
 
-struct cmd *right_cmd_set_right(struct right_cmd *c, struct cmd *right)
+char *right_cmd_get_filename(struct right_cmd *c)
 {
-    c->right = right;
-    return c->right;
+    return c->filename;
+}
+
+void right_cmd_set_filename(struct right_cmd *c, char *filename)
+{
+    c->filename = filename;
 }
 
 bool right_cmd_run(struct cmd *c)

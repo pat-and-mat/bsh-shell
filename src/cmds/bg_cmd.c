@@ -17,16 +17,18 @@ struct bg_cmd *bg_cmd_init()
 void bg_cmd_init_allocated(struct bg_cmd *c)
 {
     cmd_init_allocated(&c->base, CMD_T_BG_CMD, bg_cmd_run);
+    c->left = NULL;
+    c->right = NULL;
 }
 
 struct cmd *bg_cmd_get_left(struct bg_cmd *c)
 {
     return c->left;
 }
-struct cmd *bg_cmd_set_left(struct bg_cmd *c, struct cmd *left)
+
+void bg_cmd_set_left(struct bg_cmd *c, struct cmd *left)
 {
     c->left = left;
-    return c->left;
 }
 
 struct cmd *bg_cmd_get_right(struct bg_cmd *c)
@@ -34,10 +36,9 @@ struct cmd *bg_cmd_get_right(struct bg_cmd *c)
     return c->right;
 }
 
-struct cmd *bg_cmd_set_right(struct bg_cmd *c, struct cmd *right)
+void bg_cmd_set_right(struct bg_cmd *c, struct cmd *right)
 {
     c->right = right;
-    return c->right;
 }
 
 bool bg_cmd_run(struct cmd *c)

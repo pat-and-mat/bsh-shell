@@ -17,15 +17,15 @@ struct cd_cmd *cd_cmd_init()
 void cd_cmd_init_allocated(struct cd_cmd *c)
 {
     cmd_init_allocated(&c->base, CMD_T_CD, cd_cmd_run);
+    c->arg = NULL;
 }
 
-struct cmd *cd_cmd_set_arg(struct cd_cmd *c, char *arg)
+void cd_cmd_set_arg(struct cd_cmd *c, char *arg)
 {
     strcpy(c->arg, arg);
-    return c->arg;
 }
 
-struct cmd *cd_cmd_get_arg(struct cd_cmd *c)
+char *cd_cmd_get_arg(struct cd_cmd *c)
 {
     return c->arg;
 }

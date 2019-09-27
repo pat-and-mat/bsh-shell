@@ -17,16 +17,17 @@ struct pipe_cmd *pipe_cmd_init()
 void pipe_cmd_init_allocated(struct pipe_cmd *c)
 {
     cmd_init_allocated(&c->base, CMD_T_PIPE_CMD, pipe_cmd_run);
+    c->left = NULL;
+    c->right = NULL;
 }
 
 struct cmd *pipe_cmd_get_left(struct pipe_cmd *c)
 {
     return c->left;
 }
-struct cmd *pipe_cmd_set_left(struct pipe_cmd *c, struct cmd *left)
+void pipe_cmd_set_left(struct pipe_cmd *c, struct cmd *left)
 {
     c->left = left;
-    return c->left;
 }
 
 struct cmd *pipe_cmd_get_right(struct pipe_cmd *c)
@@ -34,10 +35,9 @@ struct cmd *pipe_cmd_get_right(struct pipe_cmd *c)
     return c->right;
 }
 
-struct cmd *pipe_cmd_set_right(struct pipe_cmd *c, struct cmd *right)
+void pipe_cmd_set_right(struct pipe_cmd *c, struct cmd *right)
 {
     c->right = right;
-    return c->right;
 }
 
 bool pipe_cmd_run(struct cmd *c)

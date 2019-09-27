@@ -1,6 +1,8 @@
 #ifndef CMD_H
 #define CMD_H
 
+#include <stdbool.h>
+
 #define CMD_T_SEP_CMD 1
 #define CMD_T_BG_CMD 2
 #define CMD_T_PIPE_CMD 3
@@ -13,11 +15,11 @@
 struct cmd
 {
     int type;
-    int (*run)(struct cmd *c);
+    bool (*run)(struct cmd *c);
 };
 
-void cmd_init_allocated(struct cmd *c, int type, int (*run)(struct cmd *c));
+void cmd_init_allocated(struct cmd *c, int type, bool (*run)(struct cmd *c));
 int cmd_get_type(struct cmd *c);
-int cmd_run(struct cmd *c);
+bool cmd_run(struct cmd *c);
 
 #endif

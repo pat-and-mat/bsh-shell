@@ -234,22 +234,22 @@ bool parser_parse_cmd_1_3(struct parser *p, struct cmd **out, struct cmd *left)
 {
     *out = NULL;
 
-    if (token_get_type(parser_lookahead(p)) != TOKEN_T_RIGHT)
+    if (token_get_type(parser_lookahead(p)) != TOKEN_T_RIGHT_APPEND)
         return false;
 
     parser_next(p);
 
-    struct right_cmd *right_cmd = right_cmd_init();
-    right_cmd_set_cmd(right_cmd, left);
+    struct right_append_cmd *right_append_cmd = right_append_cmd_init();
+    right_append_cmd_set_cmd(right_append_cmd, left);
 
     struct token *token = parser_lookahead(p);
     if (token_get_type(token) != TOKEN_T_STR)
         return false;
 
-    right_cmd_set_filename(right_cmd, token_get_lex(token));
+    right_append_cmd_set_filename(right_append_cmd, token_get_lex(token));
     parser_next(p);
 
-    *out = (struct cmd *)right_cmd;
+    *out = (struct cmd *)right_append_cmd;
     return true;
 }
 
