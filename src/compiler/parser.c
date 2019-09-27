@@ -61,6 +61,16 @@ void parser_next(struct parser *p)
     p->i++;
 }
 
+bool parser_get_is_ok(struct parser *p)
+{
+    return p->is_ok;
+}
+
+struct cmd *parser_get_cmd(struct parser *p)
+{
+    return p->cmd;
+}
+
 bool parser_parse(struct parser *p)
 {
     p->is_ok = parser_parse_cmd_line(p, &p->cmd);

@@ -20,7 +20,7 @@ TESTS_OBJ = $(addprefix $(TESTS_DIR)/$(OBJ_DIR)/, $(patsubst %.c, %.o, $(TESTS_S
 TESTS_TARGETS = $(addprefix $(TESTS_DIR)/$(TARGET_DIR)/, $(patsubst %.c, %, $(TESTS_SRC)))
 TESTS_TARGETS_ = $(TESTS_TARGETS:$(TESTS_DIR)/$(TARGET_DIR)/%=%)
 
-NECESSARY_DIRS = $(dir $(OBJ) $(TARGET)) 
+NECESSARY_DIRS = $(dir $(OBJ) $(TARGET)) ./log
 TESTS_NECESSARY_DIRS = $(dir $(TESTS_OBJ) $(TESTS_TARGETS)) $(TESTS_DIR)/log
 
 CC = gcc
@@ -55,7 +55,7 @@ clean:
 compile: $(NECESSARY_DIRS) $(TARGET)
 
 run: compile
-	./$(TARGET)
+	$(VALGRIND) --log-file=./log/shell.log ./$(TARGET)
 
 test: $(NECESSARY_DIRS) $(TESTS_NECESSARY_DIRS) $(TESTS_TARGETS)
 	@for target in $(TESTS_TARGETS_) ; do \
