@@ -1,4 +1,4 @@
-#include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
 
@@ -32,8 +32,13 @@ char *cd_cmd_get_arg(struct cd_cmd *c)
 
 bool cd_cmd_run(struct cmd *c)
 {
-    struct cd_cmd *cd_cmd = (struct cd_cmd *)c;
-    return false;
+    struct cd_cmd *cd = (struct cd_cmd *)c;
+
+    printf("cd");
+    if (cd->arg)
+        printf(" %s", cd->arg);
+
+    return true;
 }
 
 void cd_cmd_print(struct cmd *c, int depth)

@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <stdio.h>
 
 #include <cmds/cmd.h>
 #include <cmds/bg_cmd.h>
@@ -43,8 +44,20 @@ void bg_cmd_set_right(struct bg_cmd *c, struct cmd *right)
 
 bool bg_cmd_run(struct cmd *c)
 {
-    struct bg_cmd *bg_cmd = (struct bg_cmd *)c;
-    return false;
+    struct bg_cmd *bg = (struct bg_cmd *)c;
+
+    if (!bg->left || !cmd_run(bg->left))
+        printf("<error>");
+
+    printf(" &");
+
+    if (bg->right)
+    {
+        printf(" ");
+        cmd_run(bg->right);
+    }
+
+    return true;
 }
 
 void bg_cmd_print(struct cmd *c, int depth)

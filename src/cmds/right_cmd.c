@@ -1,4 +1,4 @@
-#include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
 
@@ -43,8 +43,19 @@ void right_cmd_set_filename(struct right_cmd *c, char *filename)
 
 bool right_cmd_run(struct cmd *c)
 {
-    struct right_cmd *right_cmd = (struct right_cmd *)c;
-    return false;
+    struct right_cmd *right = (struct right_cmd *)c;
+
+    if (!right->cmd || !cmd_run(right->cmd))
+        printf("<error>");
+
+    printf(" > ");
+
+    if (!right->filename)
+        printf("<error>");
+    else
+        printf("%s", right->filename);
+
+    return true;
 }
 
 void right_cmd_print(struct cmd *c, int depth)

@@ -1,4 +1,4 @@
-#include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
 
@@ -43,8 +43,20 @@ void sep_cmd_set_right(struct sep_cmd *c, struct cmd *right)
 
 bool sep_cmd_run(struct cmd *c)
 {
-    struct sep_cmd *sep_cmd = (struct sep_cmd *)c;
-    return false;
+    struct sep_cmd *sep = (struct sep_cmd *)c;
+
+    if (!sep->left || !cmd_run(sep->left))
+        printf("<error>");
+
+    printf(" ;");
+
+    if (sep->right)
+    {
+        printf(" ");
+        cmd_run(sep->right);
+    }
+
+    return true;
 }
 
 void sep_cmd_print(struct cmd *c, int depth)
