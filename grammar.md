@@ -1,55 +1,64 @@
 ### Shell Grammar
 
 ```
-	<command line>	::=  	<job>
-						|	<job> '&'
-						|	<job> '&' <command line>
-						|	<job> ';'
-						|	<job> ';' <command line>
+    <command line>      ::=      <job> ';' <command line>
+                            |    <job> '&' <command line>
+                            |    <job> ';'
+                            |    <job> '&'
+                            |    <job>
 
-	<job>			::=		<command>
-						|	<job> '|' <command>
+    <job>               ::=      <job> '|' <command>
+                            |    <command>
 
-	<command>		::=		<simple command>
-						|	<simple command> '<' <filename>
-						|	<simple command> '>' <filename>
-						|	<simple command> '>>' <filename>
+    <command>           ::=      <simple command> '<' <filename>
+                            |    <simple command> '>' <filename>
+                            |    <simple command> '>>' <filename>
+                            |    <simple command>
 
-	<simple command>::=		<pathname>
-						|	<simple command>  <token>
+    <simple command>    ::=      'cd' <str list>
+                            |    <path command>
+
+    <path command>      ::=      <str> <str list>
+
+    <str list>          ::=      <str> <str list>
+                            |    epsilon
 ```
 
 ### Shell Grammar for recursive descent parser
 ### Removed left recursion and left factoring
 
 ```
-	<command line>	::= 	<job> <command line1>
-						|	<job> <command line2>
+    <command line>      ::=     <job> <command line 1>
 
-	<command line1>	::= 	';' <command line>
-						| 	';'
-						|	(EMPTY)
-	
-	<command line2>	::= 	'&' <command line>
-						| 	'&'
-						|	(EMPTY)
+    <command line 1>    ::=     <command line 1.1>
+                            |   <command line 1.2>
+                            |   epsilon
 
-	<job>			::=		<command> <job1>
+    <command line 1.1>  ::=     ';' <command line 1.3>
 
-	<job1>			::=		'|' <job1>
-						|	(EMPTY)
+    <command line 1.2>  ::=     '&' <command line 1.3>
 
-	<command>		::=		<simple command> <command1>
+    <command line 1.3>  ::=     <command line>
+                            |   epsilon
 
-	<command1>		::=		'<' <filename>
-						|	'>' <filename>
-						|	'>>' <filename>
-						|	(EMPTY)
+    <job>               ::=     <command> <job 1>
 
-	<simple command>::=		'cd' <token list>
-						|	<pathname> <token list>
+    <job 1>             ::=     '|' <job 1>
+                            |   epsilon
 
-	<token list> ::=	<token> <token list>
-						| (EMPTY)
+    <command>           ::=     <simple command> <command 1>
+
+    <command1>          ::=     '<' <filename>
+                            |   '>' <filename>
+                            |   '>>' <filename>
+                            |   epsilon
+
+    <simple command>    ::=     'cd' <str list>
+                            |    <path command>
+
+    <path command>      ::=      <str> <str list>
+
+    <str list>          ::=      <str> <str list>
+                            |    epsilon
 ```
 
