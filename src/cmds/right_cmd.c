@@ -43,10 +43,17 @@ void right_cmd_set_filename(struct right_cmd *c, char *filename)
 
 bool right_cmd_run(struct cmd *c)
 {
+    return true;
+}
+
+void right_cmd_print(struct cmd *c)
+{
     struct right_cmd *right = (struct right_cmd *)c;
 
-    if (!right->cmd || !cmd_run(right->cmd))
+    if (!right->cmd)
         printf("<error>");
+    else
+        cmd_print(right->cmd);
 
     printf(" > ");
 
@@ -54,10 +61,4 @@ bool right_cmd_run(struct cmd *c)
         printf("<error>");
     else
         printf("%s", right->filename);
-
-    return true;
-}
-
-void right_cmd_print(struct cmd *c, int depth)
-{
 }

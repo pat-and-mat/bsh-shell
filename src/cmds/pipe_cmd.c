@@ -42,19 +42,22 @@ void pipe_cmd_set_right(struct pipe_cmd *c, struct cmd *right)
 
 bool pipe_cmd_run(struct cmd *c)
 {
-    struct pipe_cmd *pipe = (struct pipe_cmd *)c;
-
-    if (!pipe->left || !cmd_run(pipe->left))
-        printf("<error>");
-
-    printf(" | ");
-
-    if (!pipe->right || !cmd_run(pipe->right))
-        printf("<error>");
-
     return true;
 }
 
-void pipe_cmd_print(struct cmd *c, int depth)
+void pipe_cmd_print(struct cmd *c)
 {
+    struct pipe_cmd *pipe = (struct pipe_cmd *)c;
+
+    if (!pipe->left)
+        printf("<error>");
+    else
+        cmd_print(pipe->left);
+
+    printf(" | ");
+
+    if (!pipe->right)
+        printf("<error>");
+    else
+        cmd_print(pipe->right);
 }

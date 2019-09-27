@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
         }
 
         struct cmd *cmd = parser_get_cmd(parser);
-        cmd_run(cmd);
+        cmd_print(cmd);
         printf("\n");
 
         free(line);

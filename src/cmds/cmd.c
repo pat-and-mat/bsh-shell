@@ -2,10 +2,11 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-void cmd_init_allocated(struct cmd *c, int type, bool (*run)(struct cmd *c), void (*print)(struct cmd *c, int depth))
+void cmd_init_allocated(struct cmd *c, int type, bool (*run)(struct cmd *c), void (*print)(struct cmd *c))
 {
     c->type = type;
     c->run = run;
+    c->print = print;
 }
 
 int cmd_get_type(struct cmd *c)
@@ -15,9 +16,11 @@ int cmd_get_type(struct cmd *c)
 
 bool cmd_run(struct cmd *c)
 {
+    cmd_print(c);
     return (*c->run)(c);
 }
 
-void cmd_print(struct cmd *c, int depth)
+void cmd_print(struct cmd *c)
 {
+    (*c->print)(c);
 }

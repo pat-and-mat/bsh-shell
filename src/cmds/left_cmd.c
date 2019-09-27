@@ -42,10 +42,17 @@ void left_cmd_set_filename(struct left_cmd *c, char *filename)
 
 bool left_cmd_run(struct cmd *c)
 {
+    return true;
+}
+
+void left_cmd_print(struct cmd *c)
+{
     struct left_cmd *left = (struct left_cmd *)c;
 
-    if (!left->cmd || !cmd_run(left->cmd))
+    if (!left->cmd)
         printf("<error>");
+    else
+        cmd_print(left->cmd);
 
     printf(" < ");
 
@@ -53,10 +60,4 @@ bool left_cmd_run(struct cmd *c)
         printf("<error>");
     else
         printf("%s", left->filename);
-
-    return true;
-}
-
-void left_cmd_print(struct cmd *c, int depth)
-{
 }

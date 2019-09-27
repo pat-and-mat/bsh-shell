@@ -44,22 +44,23 @@ void bg_cmd_set_right(struct bg_cmd *c, struct cmd *right)
 
 bool bg_cmd_run(struct cmd *c)
 {
+    return true;
+}
+
+void bg_cmd_print(struct cmd *c)
+{
     struct bg_cmd *bg = (struct bg_cmd *)c;
 
-    if (!bg->left || !cmd_run(bg->left))
+    if (!bg->left)
         printf("<error>");
+    else
+        cmd_print(bg->left);
 
     printf(" &");
 
     if (bg->right)
     {
         printf(" ");
-        cmd_run(bg->right);
+        cmd_print(bg->right);
     }
-
-    return true;
-}
-
-void bg_cmd_print(struct cmd *c, int depth)
-{
 }

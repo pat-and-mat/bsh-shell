@@ -43,22 +43,23 @@ void sep_cmd_set_right(struct sep_cmd *c, struct cmd *right)
 
 bool sep_cmd_run(struct cmd *c)
 {
+    return true;
+}
+
+void sep_cmd_print(struct cmd *c)
+{
     struct sep_cmd *sep = (struct sep_cmd *)c;
 
-    if (!sep->left || !cmd_run(sep->left))
+    if (!sep->left)
         printf("<error>");
+    else
+        cmd_print(sep->left);
 
     printf(" ;");
 
     if (sep->right)
     {
         printf(" ");
-        cmd_run(sep->right);
+        cmd_print(sep->right);
     }
-
-    return true;
-}
-
-void sep_cmd_print(struct cmd *c, int depth)
-{
 }

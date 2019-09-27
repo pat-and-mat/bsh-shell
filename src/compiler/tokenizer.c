@@ -73,5 +73,23 @@ void tokenizer_tokenize(struct tokenizer *t)
 
 int tokenizer_get_token_type(char *lex)
 {
+    if (strcmp(lex, ";") == 0)
+        return TOKEN_T_SEMICOLON;
+
+    if (strcmp(lex, "|") == 0)
+        return TOKEN_T_PIPE;
+
+    if (strcmp(lex, "<") == 0)
+        return TOKEN_T_LEFT;
+
+    if (strcmp(lex, ">") == 0)
+        return TOKEN_T_RIGHT;
+
+    if (strcmp(lex, ">>") == 0)
+        return TOKEN_T_RIGHT_APPEND;
+
+    if (strcmp(lex, "&") == 0)
+        return TOKEN_T_BG;
+
     return TOKEN_T_STR;
 }

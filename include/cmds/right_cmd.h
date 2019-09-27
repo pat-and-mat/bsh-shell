@@ -20,6 +20,6 @@ char *right_cmd_get_filename(struct right_cmd *c);
 void right_cmd_set_filename(struct right_cmd *c, char *filename);
 
 bool right_cmd_run(struct cmd *c);
-void right_cmd_print(struct cmd *c, int depth);
+void right_cmd_print(struct cmd *c);
 
 #endif

@@ -16,6 +16,6 @@ char *cd_cmd_get_arg(struct cd_cmd *c);
 void cd_cmd_set_arg(struct cd_cmd *c, char *arg);
 
 bool cd_cmd_run(struct cmd *c);
-void cd_cmd_print(struct cmd *c, int depth);
+void cd_cmd_print(struct cmd *c);
 
 #endif

@@ -20,6 +20,6 @@ struct cmd *bg_cmd_get_right(struct bg_cmd *c);
 void bg_cmd_set_right(struct bg_cmd *c, struct cmd *right);
 
 bool bg_cmd_run(struct cmd *c);
-void bg_cmd_print(struct cmd *c, int depth);
+void bg_cmd_print(struct cmd *c);
 
 #endif

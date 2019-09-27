@@ -94,9 +94,15 @@ bool parser_parse_cmd_line(struct parser *p, struct cmd **out)
 
 bool parser_parse_cmd_line_1(struct parser *p, struct cmd **out, struct cmd *left)
 {
-    if (!parser_parse_cmd_line_1_1(p, out, left) &&
-        !parser_parse_cmd_line_1_2(p, out, left))
-        *out = left;
+    struct token *token = parser_lookahead(p);
+
+    if (token_get_type(token) == TOKEN_T_SEMICOLON)
+        return parser_parse_cmd_line_1_1(p, out, left);
+
+    if (token_get_type(token) == TOKEN_T_BG)
+        return parser_parse_cmd_line_1_2(p, out, left);
+
+    *out = left;
     return true;
 }
 
@@ -168,8 +174,13 @@ bool parser_parse_job_1(struct parser *p, struct cmd **out, struct cmd *left)
 
     parser_next(p);
 
+    struct cmd *right;
+    if (!parser_parse_cmd(p, &right))
+        return false;
+
     struct pipe_cmd *pipe_cmd = pipe_cmd_init();
     pipe_cmd_set_left(pipe_cmd, left);
+    pipe_cmd_set_right(pipe_cmd, right);
 
     return parser_parse_job_1(p, out, (struct cmd *)pipe_cmd);
 }

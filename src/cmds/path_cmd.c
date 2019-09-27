@@ -27,6 +27,11 @@ void path_cmd_add_arg(struct path_cmd *c, char *arg)
 
 bool path_cmd_run(struct cmd *c)
 {
+    return true;
+}
+
+void path_cmd_print(struct cmd *c)
+{
     struct path_cmd *path = (struct path_cmd *)c;
 
     if (vector_count(path->args) == 0)
@@ -36,10 +41,4 @@ bool path_cmd_run(struct cmd *c)
 
     for (int i = 1; i < vector_count(path->args); i++)
         printf(" %s", (char *)vector_get(path->args, i));
-
-    return true;
-}
-
-void path_cmd_print(struct cmd *c, int depth)
-{
 }

@@ -42,10 +42,17 @@ void right_append_cmd_set_filename(struct right_append_cmd *c, char *filename)
 
 bool right_append_cmd_run(struct cmd *c)
 {
+    return true;
+}
+
+void right_append_cmd_print(struct cmd *c)
+{
     struct right_append_cmd *right_append = (struct right_append_cmd *)c;
 
-    if (!right_append->cmd || !cmd_run(right_append->cmd))
+    if (!right_append->cmd)
         printf("<error>");
+    else
+        cmd_print(right_append->cmd);
 
     printf(" >> ");
 
@@ -53,10 +60,4 @@ bool right_append_cmd_run(struct cmd *c)
         printf("<error>");
     else
         printf("%s", right_append->filename);
-
-    return true;
-}
-
-void right_append_cmd_print(struct cmd *c, int depth)
-{
 }
