@@ -10,18 +10,19 @@
     <job>               ::=      <job> '|' <command>
                             |    <command>
 
-    <command>           ::=      <simple command> '<' <filename>
-                            |    <simple command> '>' <filename>
-                            |    <simple command> '>>' <filename>
+    <command>           ::=      <simple command> '<' <str>
+                            |    <simple command> '>' <str>
+                            |    <simple command> '>>' <str>
                             |    <simple command>
 
-    <simple command>    ::=      'cd' <str list>
+    <simple command>    ::=      <cd command>
                             |    <path command>
 
-    <path command>      ::=      <str> <str list>
+    <cd command>        ::=      'cd' <str>
+                            |    'cd'
 
-    <str list>          ::=      <str> <str list>
-                            |    epsilon
+    <path command>      ::=      <str> <path command>
+                            |    <str>
 ```
 
 ### Shell Grammar for recursive descent parser
@@ -48,17 +49,20 @@
 
     <command>           ::=     <simple command> <command 1>
 
-    <command1>          ::=     '<' <filename>
-                            |   '>' <filename>
-                            |   '>>' <filename>
+    <command 1>         ::=     '<' <str>
+                            |   '>' <str>
+                            |   '>>' <str>
                             |   epsilon
 
-    <simple command>    ::=     'cd' <str list>
-                            |    <path command>
+    <simple command>    ::=     <cd command>
+                            |   <path command>
 
-    <path command>      ::=      <str> <str list>
+    <cd command>        ::=     'cd' <str>
+                            |   'cd'
 
-    <str list>          ::=      <str> <str list>
-                            |    epsilon
+    <path command>      ::=     <str> <path command 1>
+    
+    <path command 1>    ::=     <str> <path command 1>
+                            |   epsilon
 ```
 
