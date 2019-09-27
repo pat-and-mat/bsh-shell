@@ -19,6 +19,6 @@ void left_cmd_set_cmd(struct left_cmd *c, struct cmd *cmd);
 char *left_cmd_get_filename(struct left_cmd *c);
 void left_cmd_set_filename(struct left_cmd *c, char *filename);
 
-int left_cmd_run(struct cmd *c);
+bool left_cmd_run(struct cmd *c);
 
 #endif

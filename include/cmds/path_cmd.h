@@ -14,6 +14,6 @@ struct path_cmd
 struct path_cmd *path_cmd_init();
 void path_cmd_init_allocated(struct path_cmd *c);
 void path_cmd_add_arg(struct path_cmd *c, char *arg);
-int path_cmd_run(struct cmd *c);
+bool path_cmd_run(struct cmd *c);
 
 #endif

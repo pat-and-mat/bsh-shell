@@ -19,6 +19,6 @@ void right_append_cmd_set_cmd(struct right_append_cmd *c, struct cmd *cmd);
 char *right_append_cmd_get_filename(struct right_append_cmd *c);
 void right_append_cmd_set_filename(struct right_append_cmd *c, char *filename);
 
-int right_append_cmd_run(struct cmd *c);
+bool right_append_cmd_run(struct cmd *c);
 
 #endif

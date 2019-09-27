@@ -19,6 +19,6 @@ void pipe_cmd_set_left(struct pipe_cmd *c, struct cmd *left);
 struct cmd *pipe_cmd_get_right(struct pipe_cmd *c);
 void pipe_cmd_set_right(struct pipe_cmd *c, struct cmd *right);
 
-int pipe_cmd_run(struct cmd *c);
+bool pipe_cmd_run(struct cmd *c);
 
 #endif

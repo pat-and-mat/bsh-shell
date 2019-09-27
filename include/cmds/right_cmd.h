@@ -19,6 +19,6 @@ void right_cmd_set_cmd(struct right_cmd *c, struct cmd *cmd);
 char *right_cmd_get_filename(struct right_cmd *c);
 void right_cmd_set_filename(struct right_cmd *c, char *filename);
 
-int right_cmd_run(struct cmd *c);
+bool right_cmd_run(struct cmd *c);
 
 #endif
