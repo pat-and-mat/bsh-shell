@@ -7,36 +7,16 @@
 #include <utils/vector.h>
 #include <utils/xmemory.h>
 
-struct left_cmd *left_cmd_init()
+struct left_cmd *left_cmd_init(char *filename)
 {
     struct left_cmd *left_cmd = xmalloc(sizeof(struct left_cmd));
-    left_cmd_init_allocated(left_cmd);
+    left_cmd_init_allocated(left_cmd, filename);
     return left_cmd;
 }
 
-void left_cmd_init_allocated(struct left_cmd *c)
+void left_cmd_init_allocated(struct left_cmd *c, char *filename)
 {
     cmd_init_allocated(&c->base, CMD_T_LEFT_CMD, left_cmd_run, left_cmd_print);
-    c->cmd = NULL;
-    c->filename = NULL;
-}
-
-struct cmd *left_cmd_get_cmd(struct left_cmd *c)
-{
-    return c->cmd;
-}
-void left_cmd_set_cmd(struct left_cmd *c, struct cmd *cmd)
-{
-    c->cmd = cmd;
-}
-
-char *left_cmd_get_filename(struct left_cmd *c)
-{
-    return c->filename;
-}
-
-void left_cmd_set_filename(struct left_cmd *c, char *filename)
-{
     c->filename = filename;
 }
 
@@ -49,12 +29,7 @@ void left_cmd_print(struct cmd *c)
 {
     struct left_cmd *left = (struct left_cmd *)c;
 
-    if (!left->cmd)
-        printf("<error>");
-    else
-        cmd_print(left->cmd);
-
-    printf(" < ");
+    printf("< ");
 
     if (!left->filename)
         printf("<error>");

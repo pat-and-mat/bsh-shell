@@ -16,18 +16,8 @@ struct cd_cmd *cd_cmd_init()
 
 void cd_cmd_init_allocated(struct cd_cmd *c)
 {
-    cmd_init_allocated(&c->base, CMD_T_CD, cd_cmd_run, cd_cmd_print);
-    c->arg = NULL;
-}
-
-void cd_cmd_set_arg(struct cd_cmd *c, char *arg)
-{
-    c->arg = arg;
-}
-
-char *cd_cmd_get_arg(struct cd_cmd *c)
-{
-    return c->arg;
+    simple_cmd_init_allocated(&c->base, "cd");
+    cmd_init_allocated((struct cmd *)(&c->base), CMD_T_CD, cd_cmd_run, cd_cmd_print);
 }
 
 bool cd_cmd_run(struct cmd *c)
@@ -37,9 +27,5 @@ bool cd_cmd_run(struct cmd *c)
 
 void cd_cmd_print(struct cmd *c)
 {
-    struct cd_cmd *cd = (struct cd_cmd *)c;
-
-    printf("cd");
-    if (cd->arg)
-        printf(" %s", cd->arg);
+    simple_cmd_print(c);
 }

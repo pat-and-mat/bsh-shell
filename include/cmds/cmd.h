@@ -9,7 +9,7 @@
 #define CMD_T_LEFT_CMD 4
 #define CMD_T_RIGHT_CMD 5
 #define CMD_T_RIGHT_APPEND_CMD 6
-#define CMD_T_PATH_CMD 7
+#define CMD_T_SIMPLE_CMD 7
 #define CMD_T_CD 8
 
 struct cmd

@@ -31,15 +31,11 @@
 ```
     <command line>      ::=     <job> <command line 1>
 
-    <command line 1>    ::=     <command line 1.1>
-                            |   <command line 1.2>
+    <command line 1>    ::=     ';' <command line 2>
+                            |   '&' <command line 2>
                             |   epsilon
 
-    <command line 1.1>  ::=     ';' <command line 1.3>
-
-    <command line 1.2>  ::=     '&' <command line 1.3>
-
-    <command line 1.3>  ::=     <command line>
+    <command line 2>    ::=     <command line>
                             |   epsilon
 
     <job>               ::=     <command> <job 1>
@@ -47,22 +43,20 @@
     <job 1>             ::=     '|' <job 1>
                             |   epsilon
 
-    <command>           ::=     <simple command> <command 1>
+    <command>           ::=     <redirect list> <str> <arg list>
 
-    <command 1>         ::=     '<' <str>
+    <redirect>          ::=     '<' <str>
                             |   '>' <str>
                             |   '>>' <str>
+
+    <redirect list>     ::=     <redirect> <redirect list>
                             |   epsilon
 
-    <simple command>    ::=     <cd command>
-                            |   <path command>
+    <str list>          ::=     <str> <str list>
+                            |   epsilon
 
-    <cd command>        ::=     'cd' <str>
-                            |   'cd'
-
-    <path command>      ::=     <str> <path command 1>
-    
-    <path command 1>    ::=     <str> <path command 1>
+    <arg list>          ::=     <str> <arg list>
+                            |   <redirect> <arg list>
                             |   epsilon
 ```
 

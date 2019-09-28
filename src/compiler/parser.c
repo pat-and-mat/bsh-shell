@@ -6,7 +6,7 @@
 #include <cmds/bg_cmd.h>
 #include <cmds/cd_cmd.h>
 #include <cmds/left_cmd.h>
-#include <cmds/path_cmd.h>
+#include <cmds/simple_cmd.h>
 #include <cmds/pipe_cmd.h>
 #include <cmds/right_append_cmd.h>
 #include <cmds/right_cmd.h>
@@ -18,23 +18,24 @@
 
 bool parser_parse_cmd_line(struct parser *p, struct cmd **out);
 bool parser_parse_cmd_line_1(struct parser *p, struct cmd **out, struct cmd *left);
-bool parser_parse_cmd_line_1_1(struct parser *p, struct cmd **out, struct cmd *left);
-bool parser_parse_cmd_line_1_2(struct parser *p, struct cmd **out, struct cmd *left);
-bool parser_parse_cmd_line_1_3(struct parser *p, struct cmd **out);
+bool parser_parse_bg_cmd(struct parser *p, struct cmd **out, struct cmd *left);
+bool parser_parse_sep_cmd(struct parser *p, struct cmd **out, struct cmd *left);
+bool parser_parse_cmd_line_2(struct parser *p, struct cmd **out);
 
 bool parser_parse_job(struct parser *p, struct cmd **out);
 bool parser_parse_job_1(struct parser *p, struct cmd **out, struct cmd *left);
+bool parser_parse_pipe_cmd(struct parser *p, struct cmd **out, struct cmd *left);
 
 bool parser_parse_cmd(struct parser *p, struct cmd **out);
-bool parser_parse_cmd_1(struct parser *p, struct cmd **out, struct cmd *left);
-bool parser_parse_cmd_1_1(struct parser *p, struct cmd **out, struct cmd *left);
-bool parser_parse_cmd_1_2(struct parser *p, struct cmd **out, struct cmd *left);
-bool parser_parse_cmd_1_3(struct parser *p, struct cmd **out, struct cmd *left);
+bool parser_parse_simple_cmd(struct parser *p, struct cmd **out, struct vector *redlist);
+bool parser_parse_arg_list(struct parser *p, struct cmd **out, struct simple_cmd *left);
 
-bool parser_parse_simple_cmd(struct parser *p, struct cmd **out);
-bool parser_parse_cd_cmd(struct parser *p, struct cmd **out);
-bool parser_parse_path_cmd(struct parser *p, struct cmd **out);
-bool parser_parse_path_cmd_1(struct parser *p, struct cmd **out, struct cmd *left);
+bool parser_parse_redirect(struct parser *p, struct cmd **out);
+bool parser_parse_redirect_list(struct parser *p, struct vector **out, struct vector *left);
+
+bool parser_parse_left_cmd(struct parser *p, struct cmd **out);
+bool parser_parse_right_cmd(struct parser *p, struct cmd **out);
+bool parser_parse_right_append_cmd(struct parser *p, struct cmd **out);
 
 struct parser *parser_init(struct vector *tokens)
 {
@@ -86,92 +87,128 @@ bool parser_parse_cmd_line(struct parser *p, struct cmd **out)
 {
     *out = NULL;
 
+    int token_t = token_get_type(parser_lookahead(p));
+    if (token_t != TOKEN_T_STR && token_t != TOKEN_T_LEFT &&
+        token_t != TOKEN_T_RIGHT && token_t != TOKEN_T_RIGHT_APPEND)
+        return false;
+
     struct cmd *job;
     if (!parser_parse_job(p, &job))
         return false;
+
     return parser_parse_cmd_line_1(p, out, job);
 }
 
 bool parser_parse_cmd_line_1(struct parser *p, struct cmd **out, struct cmd *left)
 {
-    struct token *token = parser_lookahead(p);
+    int token_t = token_get_type(parser_lookahead(p));
 
-    if (token_get_type(token) == TOKEN_T_SEMICOLON)
-        return parser_parse_cmd_line_1_1(p, out, left);
+    if (token_t == TOKEN_T_SEMICOLON)
+        return parser_parse_sep_cmd(p, out, left);
 
-    if (token_get_type(token) == TOKEN_T_BG)
-        return parser_parse_cmd_line_1_2(p, out, left);
+    if (token_t == TOKEN_T_BG)
+        return parser_parse_bg_cmd(p, out, left);
 
-    *out = left;
-    return true;
+    if (token_t == TOKEN_T_EOF)
+    {
+        *out = left;
+        return true;
+    }
+
+    *out = NULL;
+    return false;
 }
 
-bool parser_parse_cmd_line_1_1(struct parser *p, struct cmd **out, struct cmd *left)
+bool parser_parse_sep_cmd(struct parser *p, struct cmd **out, struct cmd *left)
 {
-    *out = NULL;
-
-    if (token_get_type(parser_lookahead(p)) != TOKEN_T_SEMICOLON)
-        return false;
-
     parser_next(p);
+
+    struct cmd *right;
+    if (!parser_parse_cmd_line_2(p, &right))
+    {
+        *out = NULL;
+        return false;
+    }
 
     struct sep_cmd *sep_cmd = sep_cmd_init();
     sep_cmd_set_left(sep_cmd, left);
-
-    struct cmd *right;
-    if (!parser_parse_cmd_line_1_3(p, &right))
-        return false;
-
     sep_cmd_set_right(sep_cmd, right);
 
     *out = (struct cmd *)sep_cmd;
     return true;
 }
 
-bool parser_parse_cmd_line_1_2(struct parser *p, struct cmd **out, struct cmd *left)
+bool parser_parse_bg_cmd(struct parser *p, struct cmd **out, struct cmd *left)
 {
-    *out = NULL;
-
-    if (token_get_type(parser_lookahead(p)) != TOKEN_T_BG)
-        return false;
-
     parser_next(p);
+
+    struct cmd *right;
+    if (!parser_parse_cmd_line_2(p, &right))
+    {
+        *out = NULL;
+        return false;
+    }
 
     struct bg_cmd *bg_cmd = bg_cmd_init();
     bg_cmd_set_left(bg_cmd, left);
-
-    struct cmd *right;
-    if (!parser_parse_cmd_line_1_3(p, &right))
-        return false;
-
     bg_cmd_set_right(bg_cmd, right);
 
     *out = (struct cmd *)bg_cmd;
     return true;
 }
 
-bool parser_parse_cmd_line_1_3(struct parser *p, struct cmd **out)
+bool parser_parse_cmd_line_2(struct parser *p, struct cmd **out)
 {
-    parser_parse_cmd_line(p, out);
-    return true;
+    int token_t = token_get_type(parser_lookahead(p));
+
+    *out = NULL;
+
+    if (token_t == TOKEN_T_EOF)
+        return true;
+
+    if (token_t != TOKEN_T_STR && token_t != TOKEN_T_LEFT &&
+        token_t != TOKEN_T_RIGHT && token_t != TOKEN_T_RIGHT_APPEND)
+        return false;
+
+    return parser_parse_cmd_line(p, out);
 }
 
 bool parser_parse_job(struct parser *p, struct cmd **out)
 {
+    int token_t = token_get_type(parser_lookahead(p));
+
     *out = NULL;
+
+    if (token_t != TOKEN_T_STR && token_t != TOKEN_T_LEFT &&
+        token_t != TOKEN_T_RIGHT && token_t != TOKEN_T_RIGHT_APPEND)
+        return false;
 
     struct cmd *cmd;
     if (!parser_parse_cmd(p, &cmd))
         return false;
+
     return parser_parse_job_1(p, out, cmd);
 }
 
 bool parser_parse_job_1(struct parser *p, struct cmd **out, struct cmd *left)
 {
-    *out = left;
-    if (token_get_type(parser_lookahead(p)) != TOKEN_T_PIPE)
-        return true;
+    int token_t = token_get_type(parser_lookahead(p));
 
+    if (token_t == TOKEN_T_PIPE)
+        return parser_parse_pipe_cmd(p, out, left);
+
+    if (token_t == TOKEN_T_SEMICOLON || token_t == TOKEN_T_BG || token_t == TOKEN_T_EOF)
+    {
+        *out = left;
+        return true;
+    }
+
+    *out = NULL;
+    return false;
+}
+
+bool parser_parse_pipe_cmd(struct parser *p, struct cmd **out, struct cmd *left)
+{
     parser_next(p);
 
     struct cmd *right;
@@ -189,147 +226,165 @@ bool parser_parse_cmd(struct parser *p, struct cmd **out)
 {
     *out = NULL;
 
-    struct cmd *simple_cmd;
-    if (!parser_parse_simple_cmd(p, &simple_cmd))
+    int token_type = token_get_type(parser_lookahead(p));
+
+    if (token_type != TOKEN_T_STR && token_type != TOKEN_T_LEFT &&
+        token_type != TOKEN_T_RIGHT && token_type != TOKEN_T_RIGHT_APPEND)
         return false;
 
-    return parser_parse_cmd_1(p, out, simple_cmd);
+    struct vector *redirects;
+    if (!parser_parse_redirect_list(p, &redirects, vector_init()))
+        return false;
+
+    token_type = token_get_type(parser_lookahead(p));
+
+    if (token_type != TOKEN_T_STR)
+        return false;
+
+    struct cmd *cmd;
+    if (!parser_parse_simple_cmd(p, &cmd, redirects))
+        return false;
+
+    return parser_parse_arg_list(p, out, (struct simple_cmd *)cmd);
 }
 
-bool parser_parse_cmd_1(struct parser *p, struct cmd **out, struct cmd *left)
+bool parser_parse_simple_cmd(struct parser *p, struct cmd **out, struct vector *redirects)
 {
-    if (!parser_parse_cmd_1_1(p, out, left) &&
-        !parser_parse_cmd_1_2(p, out, left) &&
-        !parser_parse_cmd_1_3(p, out, left))
-        *out = left;
+    char *token_lex = token_get_lex(parser_lookahead(p));
+
+    struct simple_cmd *simple_cmd;
+    if (strcmp(token_lex, "cd") == 0)
+        simple_cmd = (struct simple_cmd *)cd_cmd_init();
+    else
+        simple_cmd = simple_cmd_init(token_lex);
+
+    parser_next(p);
+
+    for (int i = 0; i < vector_count(redirects); i++)
+        simple_cmd_add_redirect(simple_cmd, (struct cmd *)vector_get(redirects, i));
+
+    *out = (struct cmd *)simple_cmd;
     return true;
 }
 
-bool parser_parse_cmd_1_1(struct parser *p, struct cmd **out, struct cmd *left)
+bool parser_parse_arg_list(struct parser *p, struct cmd **out, struct simple_cmd *left)
 {
-    *out = NULL;
+    int token_t = token_get_type(parser_lookahead(p));
 
-    if (token_get_type(parser_lookahead(p)) != TOKEN_T_LEFT)
-        return false;
-
-    parser_next(p);
-
-    struct left_cmd *left_cmd = left_cmd_init();
-    left_cmd_set_cmd(left_cmd, left);
-
-    struct token *token = parser_lookahead(p);
-    if (token_get_type(token) != TOKEN_T_STR)
-        return false;
-
-    left_cmd_set_filename(left_cmd, token_get_lex(token));
-    parser_next(p);
-
-    *out = (struct cmd *)left_cmd;
-    return true;
-}
-
-bool parser_parse_cmd_1_2(struct parser *p, struct cmd **out, struct cmd *left)
-{
-    *out = NULL;
-
-    if (token_get_type(parser_lookahead(p)) != TOKEN_T_RIGHT)
-        return false;
-
-    parser_next(p);
-
-    struct right_cmd *right_cmd = right_cmd_init();
-    right_cmd_set_cmd(right_cmd, left);
-
-    struct token *token = parser_lookahead(p);
-    if (token_get_type(token) != TOKEN_T_STR)
-        return false;
-
-    right_cmd_set_filename(right_cmd, token_get_lex(token));
-    parser_next(p);
-
-    *out = (struct cmd *)right_cmd;
-    return true;
-}
-
-bool parser_parse_cmd_1_3(struct parser *p, struct cmd **out, struct cmd *left)
-{
-    *out = NULL;
-
-    if (token_get_type(parser_lookahead(p)) != TOKEN_T_RIGHT_APPEND)
-        return false;
-
-    parser_next(p);
-
-    struct right_append_cmd *right_append_cmd = right_append_cmd_init();
-    right_append_cmd_set_cmd(right_append_cmd, left);
-
-    struct token *token = parser_lookahead(p);
-    if (token_get_type(token) != TOKEN_T_STR)
-        return false;
-
-    right_append_cmd_set_filename(right_append_cmd, token_get_lex(token));
-    parser_next(p);
-
-    *out = (struct cmd *)right_append_cmd;
-    return true;
-}
-
-bool parser_parse_simple_cmd(struct parser *p, struct cmd **out)
-{
-    return parser_parse_cd_cmd(p, out) ||
-           parser_parse_path_cmd(p, out);
-}
-
-bool parser_parse_cd_cmd(struct parser *p, struct cmd **out)
-{
-    *out = NULL;
-
-    struct token *token = parser_lookahead(p);
-    if (token_get_type(token) != TOKEN_T_STR ||
-        strcmp(token_get_lex(token), "cd") != 0)
-        return false;
-
-    parser_next(p);
-
-    struct cd_cmd *cd_cmd = cd_cmd_init();
-
-    token = parser_lookahead(p);
-    if (token_get_type(token) == TOKEN_T_STR)
+    if (token_t == TOKEN_T_SEMICOLON || token_t == TOKEN_T_BG ||
+        token_t == TOKEN_T_PIPE || token_t == TOKEN_T_EOF)
     {
-        cd_cmd_set_arg(cd_cmd, token_get_lex(token));
-        parser_next(p);
+        *out = (struct cmd *)left;
+        return true;
     }
 
-    *out = (struct cmd *)cd_cmd;
+    *out = NULL;
+
+    if (token_t == TOKEN_T_LEFT || token_t == TOKEN_T_RIGHT ||
+        token_t == TOKEN_T_RIGHT_APPEND)
+    {
+        struct cmd *redirect;
+        if (!parser_parse_redirect(p, &redirect))
+            return false;
+
+        simple_cmd_add_redirect(left, redirect);
+        return parser_parse_arg_list(p, out, left);
+    }
+
+    if (token_t == TOKEN_T_STR)
+    {
+        simple_cmd_add_arg(left, token_get_lex(parser_lookahead(p)));
+        parser_next(p);
+        return parser_parse_arg_list(p, out, left);
+    }
+
+    return false;
+}
+
+bool parser_parse_redirect_list(struct parser *p, struct vector **out, struct vector *left)
+{
+    int token_t = token_get_type(parser_lookahead(p));
+
+    if (token_t == TOKEN_T_STR)
+    {
+        *out = left;
+        return true;
+    }
+
+    *out = NULL;
+
+    if (token_t == TOKEN_T_LEFT || token_t == TOKEN_T_RIGHT ||
+        token_t == TOKEN_T_RIGHT_APPEND)
+    {
+        struct cmd *redirect;
+        if (!parser_parse_redirect(p, &redirect))
+            return false;
+
+        vector_add(left, redirect);
+        return parser_parse_redirect_list(p, out, left);
+    }
+
+    return false;
+}
+
+bool parser_parse_redirect(struct parser *p, struct cmd **out)
+{
+    int token_type = token_get_type(parser_lookahead(p));
+
+    if (token_type == TOKEN_T_LEFT)
+        return parser_parse_left_cmd(p, out);
+
+    if (token_type == TOKEN_T_RIGHT)
+        return parser_parse_right_cmd(p, out);
+
+    if (token_type == TOKEN_T_RIGHT_APPEND)
+        return parser_parse_right_append_cmd(p, out);
+
+    *out = NULL;
+    return false;
+}
+
+bool parser_parse_left_cmd(struct parser *p, struct cmd **out)
+{
+    parser_next(p);
+
+    struct token *token = parser_lookahead(p);
+    if (token_get_type(token) != TOKEN_T_STR)
+    {
+        *out = NULL;
+        return false;
+    }
+
+    *out = (struct cmd *)left_cmd_init(token_get_lex(token));
     return true;
 }
 
-bool parser_parse_path_cmd(struct parser *p, struct cmd **out)
+bool parser_parse_right_cmd(struct parser *p, struct cmd **out)
 {
-    *out = NULL;
+    parser_next(p);
 
     struct token *token = parser_lookahead(p);
     if (token_get_type(token) != TOKEN_T_STR)
+    {
+        *out = NULL;
         return false;
+    }
 
-    struct path_cmd *path_cmd = path_cmd_init();
-    path_cmd_add_arg(path_cmd, token_get_lex(token));
-
-    parser_next(p);
-
-    return parser_parse_path_cmd_1(p, out, (struct cmd *)path_cmd);
+    *out = (struct cmd *)right_cmd_init(token_get_lex(token));
+    return true;
 }
 
-bool parser_parse_path_cmd_1(struct parser *p, struct cmd **out, struct cmd *left)
+bool parser_parse_right_append_cmd(struct parser *p, struct cmd **out)
 {
-    *out = left;
+    parser_next(p);
 
     struct token *token = parser_lookahead(p);
     if (token_get_type(token) != TOKEN_T_STR)
-        return true;
+    {
+        *out = NULL;
+        return false;
+    }
 
-    path_cmd_add_arg((struct path_cmd *)left, token_get_lex(token));
-    parser_next(p);
-
-    return parser_parse_path_cmd_1(p, out, left);
+    *out = (struct cmd *)right_append_cmd_init(token_get_lex(token));
+    return true;
 }
