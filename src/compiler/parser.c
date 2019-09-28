@@ -356,6 +356,7 @@ bool parser_parse_left_cmd(struct parser *p, struct cmd **out)
     }
 
     *out = (struct cmd *)left_cmd_init(token_get_lex(token));
+    parser_next(p);
     return true;
 }
 
@@ -371,6 +372,7 @@ bool parser_parse_right_cmd(struct parser *p, struct cmd **out)
     }
 
     *out = (struct cmd *)right_cmd_init(token_get_lex(token));
+    parser_next(p);
     return true;
 }
 
@@ -386,5 +388,6 @@ bool parser_parse_right_append_cmd(struct parser *p, struct cmd **out)
     }
 
     *out = (struct cmd *)right_append_cmd_init(token_get_lex(token));
+    parser_next(p);
     return true;
 }
