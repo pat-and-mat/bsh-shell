@@ -49,7 +49,7 @@ $(TESTS_DIR)/$(TARGET_DIR)/%: $(TESTS_DIR)/$(OBJ_DIR)/%.o $(OBJ)
 .PHONY: compile run clean dirs test
 
 clean:
-	rm -rf obj bin
+	rm -rf obj bin log
 	rm -rf tests/obj tests/bin tests/log
 
 compile: $(NECESSARY_DIRS) $(TARGET)
