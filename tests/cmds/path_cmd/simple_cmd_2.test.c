@@ -13,9 +13,6 @@ int main()
 
     struct simple_cmd *p = simple_cmd_init("agr1");
 
-    char *arg1 = "agr1";
-    simple_cmd_add_arg(p, arg1);
-
     char *arg2 = "agr2";
     simple_cmd_add_arg(p, arg2);
 
