@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdbool.h>
 
+#include <shell/prompt.h>
 #include <compiler/text_stream.h>
 #include <compiler/token_stream.h>
 #include <compiler/preprocessor.h>
@@ -23,8 +24,10 @@ int main(int argc, char *argv[])
         line = NULL;
         len = 0;
 
-        printf("$ ");
+        print_prompt();
+
         getline(&line, &len, stdin);
+        xmem_add_manually_allocated(line);
 
         struct text_stream *text_stream;
         struct token_stream *token_stream;
@@ -42,7 +45,6 @@ int main(int argc, char *argv[])
             printf("\n");
         }
 
-        free(line);
         xmem_free();
     }
 

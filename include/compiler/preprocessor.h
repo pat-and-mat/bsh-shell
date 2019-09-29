@@ -5,6 +5,6 @@
 
 struct text_stream;
 
-bool preprocessor_preprocess(char *text, struct text_stream **out);
+bool preprocessor_preprocess(struct text_stream *stream, struct text_stream **out);
 
 #endif
