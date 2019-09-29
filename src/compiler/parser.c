@@ -57,6 +57,10 @@ bool parser_parse_cmd_line(struct token_stream *stream, struct cmd **out)
     *out = NULL;
 
     int token_t = token_get_type(token_stream_lookahead(stream));
+
+    if (token_t == TOKEN_T_EOF)
+        return true;
+
     if (token_t != TOKEN_T_STR && token_t != TOKEN_T_LEFT &&
         token_t != TOKEN_T_RIGHT && token_t != TOKEN_T_RIGHT_APPEND)
         return false;
@@ -93,7 +97,7 @@ bool parser_parse_sep_cmd(struct token_stream *stream, struct cmd **out, struct 
     token_stream_next(stream);
 
     struct cmd *right;
-    if (!parser_parse_cmd_line_2(stream, &right))
+    if (!parser_parse_cmd_line(stream, &right))
     {
         *out = NULL;
         return false;
@@ -112,7 +116,7 @@ bool parser_parse_bg_cmd(struct token_stream *stream, struct cmd **out, struct c
     token_stream_next(stream);
 
     struct cmd *right;
-    if (!parser_parse_cmd_line_2(stream, &right))
+    if (!parser_parse_cmd_line(stream, &right))
     {
         *out = NULL;
         return false;
@@ -124,22 +128,6 @@ bool parser_parse_bg_cmd(struct token_stream *stream, struct cmd **out, struct c
 
     *out = (struct cmd *)bg_cmd;
     return true;
-}
-
-bool parser_parse_cmd_line_2(struct token_stream *stream, struct cmd **out)
-{
-    int token_t = token_get_type(token_stream_lookahead(stream));
-
-    *out = NULL;
-
-    if (token_t == TOKEN_T_EOF)
-        return true;
-
-    if (token_t != TOKEN_T_STR && token_t != TOKEN_T_LEFT &&
-        token_t != TOKEN_T_RIGHT && token_t != TOKEN_T_RIGHT_APPEND)
-        return false;
-
-    return parser_parse_cmd_line(stream, out);
 }
 
 bool parser_parse_job(struct token_stream *stream, struct cmd **out)

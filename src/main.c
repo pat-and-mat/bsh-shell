@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
             printf("Lexical analysis failed\n");
         else if (!parser_parse(token_stream, &cmd))
             printf("Syntax analysis failed\n");
-        else
+        else if (cmd != NULL)
         {
             cmd_print(cmd);
             printf("\n");
