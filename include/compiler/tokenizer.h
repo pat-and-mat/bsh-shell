@@ -4,8 +4,8 @@
 #include <stdbool.h>
 
 struct token_stream;
-struct text_reader;
+struct text_stream;
 
-bool tokenizer_tokenize(struct text_reader *reader, struct token_stream **out);
+bool tokenizer_tokenize(struct text_stream *reader, struct token_stream **out);
 
 #endif

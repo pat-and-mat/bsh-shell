@@ -1,9 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <stdbool.h>
 
-#include <compiler/text_reader.h>
+#include <compiler/text_stream.h>
 #include <compiler/token_stream.h>
+#include <compiler/preprocessor.h>
 #include <compiler/tokenizer.h>
 #include <compiler/parser.h>
 #include <cmds/cmd.h>
@@ -24,10 +26,13 @@ int main(int argc, char *argv[])
         printf("$ ");
         getline(&line, &len, stdin);
 
+        struct text_stream *text_stream;
         struct token_stream *token_stream;
         struct cmd *cmd;
 
-        if (!tokenizer_tokenize(text_reader_init(line), &token_stream))
+        if (!preprocessor_preprocess(line, &text_stream))
+            printf("Preprocessing failed");
+        else if (!tokenizer_tokenize(text_stream, &token_stream))
             printf("Lexical analysis failed\n");
         else if (!parser_parse(token_stream, &cmd))
             printf("Syntax analysis failed\n");

@@ -6,7 +6,7 @@
 #include <utils/xmemory.h>
 #include <compiler/tokenizer.h>
 #include <compiler/token.h>
-#include <compiler/text_reader.h>
+#include <compiler/text_stream.h>
 #include <compiler/token_stream.h>
 
 #define STATE_ERROR -1
@@ -29,22 +29,22 @@
 
 #define MAX_STATE 13
 
-int tokenizer_state_start(struct text_reader *t, struct vector *tokens);
-int tokenizer_state_eof(struct text_reader *t, struct vector *tokens);
-int tokenizer_state_space(struct text_reader *t, struct vector *tokens);
-int tokenizer_state_semicolon(struct text_reader *t, struct vector *tokens);
-int tokenizer_state_bg(struct text_reader *t, struct vector *tokens);
-int tokenizer_state_pipe(struct text_reader *t, struct vector *tokens);
-int tokenizer_state_left(struct text_reader *t, struct vector *tokens);
-int tokenizer_state_right(struct text_reader *t, struct vector *tokens);
-int tokenizer_state_right_append(struct text_reader *t, struct vector *tokens);
-int tokenizer_state_alnum(struct text_reader *t, struct vector *tokens);
-int tokenizer_state_scape_char(struct text_reader *t, struct vector *tokens);
-int tokenizer_state_oquote(struct text_reader *t, struct vector *tokens);
-int tokenizer_state_cquote(struct text_reader *t, struct vector *tokens);
-int tokenizer_state_quoted(struct text_reader *t, struct vector *tokens);
+int tokenizer_state_start(struct text_stream *t, struct vector *tokens);
+int tokenizer_state_eof(struct text_stream *t, struct vector *tokens);
+int tokenizer_state_space(struct text_stream *t, struct vector *tokens);
+int tokenizer_state_semicolon(struct text_stream *t, struct vector *tokens);
+int tokenizer_state_bg(struct text_stream *t, struct vector *tokens);
+int tokenizer_state_pipe(struct text_stream *t, struct vector *tokens);
+int tokenizer_state_left(struct text_stream *t, struct vector *tokens);
+int tokenizer_state_right(struct text_stream *t, struct vector *tokens);
+int tokenizer_state_right_append(struct text_stream *t, struct vector *tokens);
+int tokenizer_state_alnum(struct text_stream *t, struct vector *tokens);
+int tokenizer_state_scape_char(struct text_stream *t, struct vector *tokens);
+int tokenizer_state_oquote(struct text_stream *t, struct vector *tokens);
+int tokenizer_state_cquote(struct text_stream *t, struct vector *tokens);
+int tokenizer_state_quoted(struct text_stream *t, struct vector *tokens);
 
-int (*states[MAX_STATE + 1])(struct text_reader *, struct vector *);
+int (*states[MAX_STATE + 1])(struct text_stream *, struct vector *);
 
 void states_init()
 {
@@ -64,7 +64,7 @@ void states_init()
     states[STATE_QUOTED] = tokenizer_state_quoted;
 }
 
-bool tokenizer_tokenize(struct text_reader *t, struct token_stream **out)
+bool tokenizer_tokenize(struct text_stream *t, struct token_stream **out)
 {
     states_init();
     struct vector *tokens = vector_init();
@@ -81,12 +81,12 @@ bool tokenizer_tokenize(struct text_reader *t, struct token_stream **out)
     return true;
 }
 
-int tokenizer_state_start(struct text_reader *t, struct vector *tokens)
+int tokenizer_state_start(struct text_stream *t, struct vector *tokens)
 {
-    char c = text_reader_lookahead(t);
+    char c = text_stream_lookahead(t);
     int state = STATE_ERROR;
 
-    if (c == TEXT_READER_EOF)
+    if (c == TEXT_STREAM_EOF)
         state = STATE_EOF;
     if (c == ' ')
         state = STATE_SPACE;
@@ -107,135 +107,135 @@ int tokenizer_state_start(struct text_reader *t, struct vector *tokens)
     if (isalnum(c))
         state = STATE_ALNUM;
 
-    text_reader_next(t);
+    text_stream_next(t);
     return state;
 }
 
-int tokenizer_state_eof(struct text_reader *t, struct vector *tokens)
+int tokenizer_state_eof(struct text_stream *t, struct vector *tokens)
 {
     vector_add(tokens, token_init(TOKEN_T_EOF, "$"));
     return STATE_DONE;
 }
 
-int tokenizer_state_space(struct text_reader *t, struct vector *tokens)
+int tokenizer_state_space(struct text_stream *t, struct vector *tokens)
 {
-    char c = text_reader_lookahead(t);
+    char c = text_stream_lookahead(t);
 
     if (c == ' ')
     {
-        text_reader_next(t);
+        text_stream_next(t);
         return STATE_SPACE;
     }
 
-    text_reader_recognize(t);
+    text_stream_recognize(t);
     return STATE_START;
 }
 
-int tokenizer_state_semicolon(struct text_reader *t, struct vector *tokens)
+int tokenizer_state_semicolon(struct text_stream *t, struct vector *tokens)
 {
-    char *lex = text_reader_recognize(t);
+    char *lex = text_stream_recognize(t);
     vector_add(tokens, token_init(TOKEN_T_SEMICOLON, lex));
     return STATE_START;
 }
 
-int tokenizer_state_bg(struct text_reader *t, struct vector *tokens)
+int tokenizer_state_bg(struct text_stream *t, struct vector *tokens)
 {
-    char *lex = text_reader_recognize(t);
+    char *lex = text_stream_recognize(t);
     vector_add(tokens, token_init(TOKEN_T_BG, lex));
     return STATE_START;
 }
 
-int tokenizer_state_pipe(struct text_reader *t, struct vector *tokens)
+int tokenizer_state_pipe(struct text_stream *t, struct vector *tokens)
 {
-    char *lex = text_reader_recognize(t);
+    char *lex = text_stream_recognize(t);
     vector_add(tokens, token_init(TOKEN_T_PIPE, lex));
     return STATE_START;
 }
 
-int tokenizer_state_left(struct text_reader *t, struct vector *tokens)
+int tokenizer_state_left(struct text_stream *t, struct vector *tokens)
 {
-    char *lex = text_reader_recognize(t);
+    char *lex = text_stream_recognize(t);
     vector_add(tokens, token_init(TOKEN_T_LEFT, lex));
     return STATE_START;
 }
 
-int tokenizer_state_right(struct text_reader *t, struct vector *tokens)
+int tokenizer_state_right(struct text_stream *t, struct vector *tokens)
 {
-    char c = text_reader_lookahead(t);
+    char c = text_stream_lookahead(t);
 
     if (c == '>')
     {
-        text_reader_next(t);
+        text_stream_next(t);
         return STATE_RIGHT_APPEND;
     }
 
-    char *lex = text_reader_recognize(t);
+    char *lex = text_stream_recognize(t);
     vector_add(tokens, token_init(TOKEN_T_RIGHT, lex));
     return STATE_START;
 }
 
-int tokenizer_state_right_append(struct text_reader *t, struct vector *tokens)
+int tokenizer_state_right_append(struct text_stream *t, struct vector *tokens)
 {
-    char *lex = text_reader_recognize(t);
+    char *lex = text_stream_recognize(t);
     vector_add(tokens, token_init(TOKEN_T_RIGHT_APPEND, lex));
     return STATE_START;
 }
 
-int tokenizer_state_alnum(struct text_reader *t, struct vector *tokens)
+int tokenizer_state_alnum(struct text_stream *t, struct vector *tokens)
 {
-    char c = text_reader_lookahead(t);
+    char c = text_stream_lookahead(t);
 
     if (isalnum(c))
     {
-        text_reader_next(t);
+        text_stream_next(t);
         return STATE_ALNUM;
     }
 
-    char *lex = text_reader_recognize(t);
+    char *lex = text_stream_recognize(t);
     vector_add(tokens, token_init(TOKEN_T_STR, lex));
     return STATE_START;
 }
 
-int tokenizer_state_scape_char(struct text_reader *t, struct vector *tokens)
+int tokenizer_state_scape_char(struct text_stream *t, struct vector *tokens)
 {
-    char c = text_reader_lookahead(t);
-    if (c == TEXT_READER_EOF)
+    char c = text_stream_lookahead(t);
+    if (c == TEXT_STREAM_EOF)
         return STATE_ERROR;
 
-    text_reader_next(t);
+    text_stream_next(t);
     return STATE_ALNUM;
 }
 
-int tokenizer_state_oquote(struct text_reader *t, struct vector *tokens)
+int tokenizer_state_oquote(struct text_stream *t, struct vector *tokens)
 {
-    char c = text_reader_lookahead(t);
-    if (c == TEXT_READER_EOF)
+    char c = text_stream_lookahead(t);
+    if (c == TEXT_STREAM_EOF)
         return STATE_ERROR;
 
-    text_reader_next(t);
+    text_stream_next(t);
     return STATE_QUOTED;
 }
 
-int tokenizer_state_cquote(struct text_reader *t, struct vector *tokens)
+int tokenizer_state_cquote(struct text_stream *t, struct vector *tokens)
 {
-    char *lex = text_reader_recognize(t);
+    char *lex = text_stream_recognize(t);
     vector_add(tokens, token_init(TOKEN_T_STR, lex));
     return STATE_START;
 }
 
-int tokenizer_state_quoted(struct text_reader *t, struct vector *tokens)
+int tokenizer_state_quoted(struct text_stream *t, struct vector *tokens)
 {
-    char c = text_reader_lookahead(t);
+    char c = text_stream_lookahead(t);
 
-    if (c == TEXT_READER_EOF)
+    if (c == TEXT_STREAM_EOF)
         return STATE_ERROR;
 
     if (c == '"')
     {
-        text_reader_next(t);
+        text_stream_next(t);
         return STATE_CQUOTE;
     }
 
-    text_reader_next(t);
+    text_stream_next(t);
     return STATE_QUOTED;
 }
