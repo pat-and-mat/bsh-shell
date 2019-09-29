@@ -30,9 +30,7 @@ void xmem_free()
 
 void *xmalloc(size_t size)
 {
-    if (xmemory.capacity == xmemory.count)
-        xmem_resize();
-    return xmemory.addrs[xmemory.count++] = malloc(size);
+    xmem_add_manually_allocated(malloc(size));
 }
 
 void *xrealloc(void *ptr, size_t size)
@@ -55,4 +53,11 @@ void xmem_resize()
         xmemory.addrs = addrs;
         xmemory.capacity = capacity;
     }
+}
+
+void xmem_add_manually_allocated(void *ptr)
+{
+    if (xmemory.capacity == xmemory.count)
+        xmem_resize();
+    return xmemory.addrs[xmemory.count++] = ptr;
 }
