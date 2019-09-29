@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
         struct token_stream *token_stream;
         struct cmd *cmd;
 
-        if (!preprocessor_preprocess(line, &text_stream))
+        if (!preprocessor_preprocess(text_stream_init(line), &text_stream))
             printf("Preprocessing failed");
         else if (!tokenizer_tokenize(text_stream, &token_stream))
             printf("Lexical analysis failed\n");
