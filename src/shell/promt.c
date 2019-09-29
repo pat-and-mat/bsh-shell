@@ -8,7 +8,7 @@
 #include <utils/xmemory.h>
 #include <utils/colors.h>
 
-#define PROMPT_SEP "\ue0b0"
+#define PROMPT_SEP "\ue0b0" //"\u2b80"
 
 void print_cwd();
 void print_end();
