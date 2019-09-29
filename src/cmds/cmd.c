@@ -16,7 +16,6 @@ int cmd_get_type(struct cmd *c)
 
 bool cmd_run(struct cmd *c)
 {
-    cmd_print(c);
     return (*c->run)(c);
 }
 

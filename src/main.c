@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+#include <compiler/text_reader.h>
+#include <compiler/token_stream.h>
 #include <compiler/tokenizer.h>
 #include <compiler/parser.h>
 #include <cmds/cmd.h>
@@ -22,23 +24,18 @@ int main(int argc, char *argv[])
         printf("$ ");
         getline(&line, &len, stdin);
 
-        struct tokenizer *tokenizer = tokenizer_init(line);
-        tokenizer_tokenize(tokenizer);
+        struct token_stream *token_stream;
+        struct cmd *cmd;
 
-        struct vector *tokens = tokenizer_get_tokens(tokenizer);
-
-        struct parser *parser = parser_init(tokens);
-
-        if (!parser_parse(parser))
+        if (!tokenizer_tokenize(text_reader_init(line), &token_stream))
+            printf("Lexical analysis failed\n");
+        else if (!parser_parse(token_stream, &cmd))
+            printf("Syntax analysis failed\n");
+        else
         {
-            printf("Parsing error\n");
-            xmem_free();
-            continue;
+            cmd_print(cmd);
+            printf("\n");
         }
-
-        struct cmd *cmd = parser_get_cmd(parser);
-        cmd_print(cmd);
-        printf("\n");
 
         free(line);
         xmem_free();
