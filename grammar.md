@@ -30,12 +30,10 @@
 
 ```
     <command line>      ::=     <job> <command line 1>
-
-    <command line 1>    ::=     ';' <command line 2>
-                            |   '&' <command line 2>
                             |   epsilon
 
-    <command line 2>    ::=     <command line>
+    <command line 1>    ::=     ';' <command line>
+                            |   '&' <command line>
                             |   epsilon
 
     <job>               ::=     <command> <job 1>
