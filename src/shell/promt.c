@@ -11,6 +11,7 @@
 #define PROMPT_SEP "\ue0b0"
 
 void print_cwd();
+void print_end();
 
 int fg_color;
 int bg_color;
@@ -18,6 +19,7 @@ int bg_color;
 void print_prompt()
 {
     print_cwd();
+    print_end();
 
     printf("%s%s ", build_fg_color(bg_color), PROMPT_SEP);
     printf(COLOR_RESET);
@@ -49,4 +51,16 @@ char *fix_home_prefix(char *cwd, char *homedir)
 
     cwd[--i] = '~';
     return cwd + i;
+}
+
+void print_end()
+{
+    int prev_bg_color = bg_color;
+    bg_color = COLOR_GREEN;
+    fg_color = COLOR_BLACK;
+
+    printf("%s%s", build_color(prev_bg_color, bg_color), PROMPT_SEP);
+    printf("%s%s", build_color(fg_color, bg_color), " bsh");
+
+    printf(COLOR_RESET);
 }
