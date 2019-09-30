@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
+#include <unistd.h>
+#include <fcntl.h>
 
 #include <cmds/cmd.h>
 #include <cmds/right_cmd.h>
@@ -22,6 +24,13 @@ void right_cmd_init_allocated(struct right_cmd *c, char *filename)
 
 bool right_cmd_run(struct cmd *c)
 {
+    struct right_cmd *right = (struct right_cmd *)c;
+
+    right->base.fd = open(right->base.filename, O_WRONLY | O_CREAT);
+    if (right->base.fd == -1)
+        return false;
+
+    dup2(right->base.fd, STDOUT_FILENO);
     return true;
 }
 

@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
+#include <unistd.h>
+#include <fcntl.h>
 
 #include <cmds/cmd.h>
 #include <cmds/right_append_cmd.h>
@@ -22,6 +24,13 @@ void right_append_cmd_init_allocated(struct right_append_cmd *c, char *filename)
 
 bool right_append_cmd_run(struct cmd *c)
 {
+    struct right_append_cmd *right_append = (struct right_append_cmd *)c;
+
+    right_append->base.fd = open(right_append->base.filename, O_WRONLY | O_CREAT | O_APPEND);
+    if (right_append->base.fd == -1)
+        return false;
+
+    dup2(right_append->base.fd, STDOUT_FILENO);
     return true;
 }
 
