@@ -26,11 +26,13 @@ bool right_cmd_run(struct cmd *c)
 {
     struct right_cmd *right = (struct right_cmd *)c;
 
-    right->base.fd = open(right->base.filename, O_WRONLY | O_CREAT);
+    right->base.fd = open(right->base.filename, O_WRONLY | O_CREAT | O_TRUNC);
     if (right->base.fd == -1)
         return false;
 
-    dup2(right->base.fd, STDOUT_FILENO);
+    if (dup2(right->base.fd, STDOUT_FILENO) == -1)
+        return false;
+
     return true;
 }
 

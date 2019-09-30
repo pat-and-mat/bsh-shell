@@ -1,7 +1,11 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
 #include <unistd.h>
+#include <sys/types.h>
+#include <libgen.h>
+#include <wait.h>
 
 #include <cmds/cmd.h>
 #include <cmds/simple_cmd.h>
@@ -38,6 +42,38 @@ void simple_cmd_add_redirect(struct simple_cmd *c, struct cmd *redirect)
 
 bool simple_cmd_run(struct cmd *c)
 {
+    struct simple_cmd *simple = (struct simple_cmd *)c;
+
+    if (!simple_cmd_open_redirects(c))
+    {
+        simple_cmd_close_redirects(c);
+        return false;
+    }
+
+    pid_t pid = fork();
+    if (pid == -1)
+    {
+        simple_cmd_close_redirects(c);
+        return false;
+    }
+
+    char *args[vector_count(simple->args) + 1];
+    args[0] = basename((char *)vector_get(simple->args, 0));
+    for (int i = 1; i < vector_count(simple->args) + 1; i++)
+        args[i] = (char *)vector_get(simple->args, i);
+    args[vector_count(simple->args)] = NULL;
+
+    if (!pid && execvp((char *)vector_get(simple->args, 0), args) == -1)
+        exit(EXIT_FAILURE);
+
+    int status;
+    waitpid(pid, &status, 0);
+
+    simple_cmd_close_redirects(c);
+
+    if (!WIFEXITED(status) || WEXITSTATUS(status) == EXIT_FAILURE)
+        return false;
+
     return true;
 }
 
