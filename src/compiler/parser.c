@@ -5,6 +5,7 @@
 #include <cmds/cmd.h>
 #include <cmds/bg_cmd.h>
 #include <cmds/cd_cmd.h>
+#include <cmds/history_cmd.h>
 #include <cmds/left_cmd.h>
 #include <cmds/simple_cmd.h>
 #include <cmds/pipe_cmd.h>
@@ -212,6 +213,8 @@ bool parser_parse_simple_cmd(struct token_stream *stream, struct cmd **out, stru
     struct simple_cmd *simple_cmd;
     if (strcmp(token_lex, "cd") == 0)
         simple_cmd = (struct simple_cmd *)cd_cmd_init();
+    else if (strcmp(token_lex, "history") == 0)
+        simple_cmd = (struct simple_cmd *)history_cmd_init();
     else
         simple_cmd = simple_cmd_init(token_lex);
 
