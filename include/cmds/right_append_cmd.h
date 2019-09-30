@@ -1,12 +1,11 @@
 #ifndef RIGHT_APPEND_CMD_H
 #define RIGHT_APPEND_CMD_H
 
-#include <cmds/cmd.h>
+#include <cmds/redirect_cmd.h>
 
 struct right_append_cmd
 {
-    struct cmd base;
-    char *filename;
+    struct redirect_cmd base;
 };
 
 struct right_append_cmd *right_append_cmd_init(char *filename);

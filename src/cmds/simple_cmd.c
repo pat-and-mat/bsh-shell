@@ -1,9 +1,11 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
+#include <unistd.h>
 
 #include <cmds/cmd.h>
 #include <cmds/simple_cmd.h>
+#include <cmds/redirect_cmd.h>
 #include <utils/vector.h>
 #include <utils/xmemory.h>
 
@@ -19,6 +21,8 @@ void simple_cmd_init_allocated(struct simple_cmd *c, char *cmd)
     cmd_init_allocated(&c->base, CMD_T_SIMPLE_CMD, simple_cmd_run, simple_cmd_print);
     c->args = vector_init();
     c->redirects = vector_init();
+    c->saved_stdin = -1;
+    c->saved_stdout = -1;
     simple_cmd_add_arg(c, cmd);
 }
 
@@ -35,6 +39,37 @@ void simple_cmd_add_redirect(struct simple_cmd *c, struct cmd *redirect)
 bool simple_cmd_run(struct cmd *c)
 {
     return true;
+}
+
+bool simple_cmd_open_redirects(struct cmd *c)
+{
+    struct simple_cmd *simple = (struct simple_cmd *)c;
+
+    simple->saved_stdin = dup(STDIN_FILENO);
+    simple->saved_stdout = dup(STDOUT_FILENO);
+
+    for (int i = 0; i < vector_count(simple->redirects); i++)
+        if (!cmd_run((struct cmd *)vector_get(simple->redirects, i)))
+            return false;
+    return true;
+}
+
+void simple_cmd_close_redirects(struct cmd *c)
+{
+    struct simple_cmd *simple = (struct simple_cmd *)c;
+    for (int i = 0; i < vector_count(simple->redirects); i++)
+        redirect_cmd_close((struct redirect_cmd *)vector_get(simple->redirects, i));
+
+    if (simple->saved_stdin != -1)
+    {
+        dup2(simple->saved_stdin, STDIN_FILENO);
+        close(simple->saved_stdin);
+    }
+    if (simple->saved_stdout != -1)
+    {
+        dup2(simple->saved_stdout, STDOUT_FILENO);
+        close(simple->saved_stdout);
+    }
 }
 
 void simple_cmd_print(struct cmd *c)

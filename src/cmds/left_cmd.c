@@ -16,8 +16,8 @@ struct left_cmd *left_cmd_init(char *filename)
 
 void left_cmd_init_allocated(struct left_cmd *c, char *filename)
 {
-    cmd_init_allocated(&c->base, CMD_T_LEFT_CMD, left_cmd_run, left_cmd_print);
-    c->filename = filename;
+    redirect_cmd_init_allocated(&c->base, filename);
+    cmd_init_allocated((struct cmd *)&c->base, CMD_T_LEFT_CMD, left_cmd_run, left_cmd_print);
 }
 
 bool left_cmd_run(struct cmd *c)
@@ -31,8 +31,8 @@ void left_cmd_print(struct cmd *c)
 
     printf("< ");
 
-    if (!left->filename)
+    if (!left->base.filename)
         printf("<error>");
     else
-        printf("%s", left->filename);
+        printf("%s", left->base.filename);
 }

@@ -1,12 +1,11 @@
 #ifndef RIGHT_CMD_H
 #define RIGHT_CMD_H
 
-#include <cmds/cmd.h>
+#include <cmds/redirect_cmd.h>
 
 struct right_cmd
 {
-    struct cmd base;
-    char *filename;
+    struct redirect_cmd base;
 };
 
 struct right_cmd *right_cmd_init(char *filename);

@@ -29,19 +29,20 @@ bool cd_cmd_run(struct cmd *c)
 
     int saved_stdout = dup(STDOUT_FILENO);
 
-    for (int i = 0; i < vector_count(cd->base.redirects); i++)
-        cmd_run(vector_get(cd->base.redirects, i));
+    if (!simple_cmd_open_redirects(c))
+    {
+        simple_cmd_close_redirects(c);
+        return false;
+    }
 
     if ((vector_count(cd->base.args) == 1 && chdir(getpwuid(getuid())->pw_dir) == 0) ||
         (vector_count(cd->base.args) == 2 && chdir(vector_get(cd->base.args, 1)) == 0))
     {
-        dup2(saved_stdout, STDOUT_FILENO);
-        close(saved_stdout);
+        simple_cmd_close_redirects(c);
         return true;
     }
 
-    dup2(saved_stdout, STDOUT_FILENO);
-    close(saved_stdout);
+    simple_cmd_close_redirects(c);
     return false;
 }
 
