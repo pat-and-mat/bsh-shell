@@ -21,7 +21,7 @@
 #define STATE_LEFT 6
 #define STATE_RIGHT 7
 #define STATE_RIGHT_APPEND 8
-#define STATE_ALNUM 9
+#define STATE_ALPHABET 9
 #define STATE_SCAPE_CHAR 10
 #define STATE_OQUOTE 11
 #define STATE_CQUOTE 12
@@ -38,13 +38,15 @@ int tokenizer_state_pipe(struct text_stream *t, struct vector *tokens);
 int tokenizer_state_left(struct text_stream *t, struct vector *tokens);
 int tokenizer_state_right(struct text_stream *t, struct vector *tokens);
 int tokenizer_state_right_append(struct text_stream *t, struct vector *tokens);
-int tokenizer_state_alnum(struct text_stream *t, struct vector *tokens);
+int tokenizer_state_alphabet(struct text_stream *t, struct vector *tokens);
 int tokenizer_state_scape_char(struct text_stream *t, struct vector *tokens);
 int tokenizer_state_oquote(struct text_stream *t, struct vector *tokens);
 int tokenizer_state_cquote(struct text_stream *t, struct vector *tokens);
 int tokenizer_state_quoted(struct text_stream *t, struct vector *tokens);
 
 int (*states[MAX_STATE + 1])(struct text_stream *, struct vector *);
+
+bool is_in_alphabet(char c);
 
 void states_init()
 {
@@ -57,7 +59,7 @@ void states_init()
     states[STATE_LEFT] = tokenizer_state_left;
     states[STATE_RIGHT] = tokenizer_state_right;
     states[STATE_RIGHT_APPEND] = tokenizer_state_right_append;
-    states[STATE_ALNUM] = tokenizer_state_alnum;
+    states[STATE_ALPHABET] = tokenizer_state_alphabet;
     states[STATE_SCAPE_CHAR] = tokenizer_state_scape_char;
     states[STATE_OQUOTE] = tokenizer_state_oquote;
     states[STATE_CQUOTE] = tokenizer_state_cquote;
@@ -84,28 +86,53 @@ bool tokenizer_tokenize(struct text_stream *t, struct token_stream **out)
 int tokenizer_state_start(struct text_stream *t, struct vector *tokens)
 {
     char c = text_stream_lookahead(t);
-    int state = STATE_ERROR;
+    int state;
 
-    if (c == TEXT_STREAM_EOF)
+    if (is_in_alphabet(c))
+    {
+        text_stream_accept(t);
+        text_stream_next(t);
+        return STATE_ALPHABET;
+    }
+
+    switch (c)
+    {
+    case TEXT_STREAM_EOF:
         state = STATE_EOF;
-    if (c == ' ')
+        break;
+    case ' ':
         state = STATE_SPACE;
-    if (c == ';')
+        break;
+    case ';':
         state = STATE_SEMICOLON;
-    if (c == '&')
+        text_stream_accept(t);
+        break;
+    case '&':
         state = STATE_BG;
-    if (c == '|')
+        text_stream_accept(t);
+        break;
+    case '|':
         state = STATE_PIPE;
-    if (c == '<')
+        text_stream_accept(t);
+        break;
+    case '<':
         state = STATE_LEFT;
-    if (c == '>')
+        text_stream_accept(t);
+        break;
+    case '>':
         state = STATE_RIGHT;
-    if (c == '"')
+        text_stream_accept(t);
+        break;
+    case '"':
         state = STATE_OQUOTE;
-    if (c == '\\')
+        break;
+    case '\\':
         state = STATE_SCAPE_CHAR;
-    if (isalnum(c))
-        state = STATE_ALNUM;
+        break;
+    default:
+        state = STATE_ERROR;
+        break;
+    }
 
     text_stream_next(t);
     return state;
@@ -127,7 +154,6 @@ int tokenizer_state_space(struct text_stream *t, struct vector *tokens)
         return STATE_SPACE;
     }
 
-    text_stream_recognize(t);
     return STATE_START;
 }
 
@@ -165,6 +191,7 @@ int tokenizer_state_right(struct text_stream *t, struct vector *tokens)
 
     if (c == '>')
     {
+        text_stream_accept(t);
         text_stream_next(t);
         return STATE_RIGHT_APPEND;
     }
@@ -181,14 +208,21 @@ int tokenizer_state_right_append(struct text_stream *t, struct vector *tokens)
     return STATE_START;
 }
 
-int tokenizer_state_alnum(struct text_stream *t, struct vector *tokens)
+int tokenizer_state_alphabet(struct text_stream *t, struct vector *tokens)
 {
     char c = text_stream_lookahead(t);
 
-    if (isalnum(c))
+    if (is_in_alphabet(c))
+    {
+        text_stream_accept(t);
+        text_stream_next(t);
+        return STATE_ALPHABET;
+    }
+
+    if (c == '\\')
     {
         text_stream_next(t);
-        return STATE_ALNUM;
+        return STATE_SCAPE_CHAR;
     }
 
     char *lex = text_stream_recognize(t);
@@ -202,8 +236,9 @@ int tokenizer_state_scape_char(struct text_stream *t, struct vector *tokens)
     if (c == TEXT_STREAM_EOF)
         return STATE_ERROR;
 
+    text_stream_accept(t);
     text_stream_next(t);
-    return STATE_ALNUM;
+    return STATE_ALPHABET;
 }
 
 int tokenizer_state_oquote(struct text_stream *t, struct vector *tokens)
@@ -212,6 +247,7 @@ int tokenizer_state_oquote(struct text_stream *t, struct vector *tokens)
     if (c == TEXT_STREAM_EOF)
         return STATE_ERROR;
 
+    text_stream_accept(t);
     text_stream_next(t);
     return STATE_QUOTED;
 }
@@ -236,6 +272,12 @@ int tokenizer_state_quoted(struct text_stream *t, struct vector *tokens)
         return STATE_CQUOTE;
     }
 
+    text_stream_accept(t);
     text_stream_next(t);
     return STATE_QUOTED;
+}
+
+bool is_in_alphabet(char c)
+{
+    return isalnum(c) || c == '.' || c == '-' || c == '_' || c == '/';
 }
