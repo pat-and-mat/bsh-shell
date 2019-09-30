@@ -9,6 +9,7 @@
 #include <cmds/history_cmd.h>
 #include <utils/vector.h>
 #include <utils/xmemory.h>
+#include <shell/history.h>
 
 struct history_cmd *history_cmd_init()
 {
