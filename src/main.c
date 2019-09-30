@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
 void open_session()
 {
     xmem_init();
-    history_init("/home/jmederos/bsh_history");
+    history_init("/tmp/bsh_history");
     history_load();
 }
 

@@ -55,10 +55,15 @@ void history_save()
 {
     FILE *hist_stream = fopen(history.file, "w");
 
-    for (int i = 0; i < vector_count(history.commands); i++)
-        fprintf(hist_stream, ">%s\n", (char *)vector_get(history.commands, i));
+    if (hist_stream)
+    {
+        for (int i = 0; i < vector_count(history.commands); i++)
+            fprintf(hist_stream, ">%s\n", (char *)vector_get(history.commands, i));
 
-    fclose(hist_stream);
+        fclose(hist_stream);
+    }
+    else
+        printf("Could not save history\n");
 }
 
 void history_add(char *cmd_line)
