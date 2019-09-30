@@ -4,6 +4,7 @@
 #include <stdbool.h>
 
 #include <shell/prompt.h>
+#include <shell/history.h>
 #include <compiler/text_stream.h>
 #include <compiler/token_stream.h>
 #include <compiler/preprocessor.h>
@@ -12,9 +13,12 @@
 #include <cmds/cmd.h>
 #include <utils/xmemory.h>
 
+void open_session();
+void close_session();
+
 int main(int argc, char *argv[])
 {
-    xmem_init();
+    open_session();
 
     char *line;
     size_t len;
@@ -54,6 +58,19 @@ int main(int argc, char *argv[])
         }
     }
 
-    xmem_free();
+    close_session();
     return 0;
+}
+
+void open_session()
+{
+    xmem_init();
+    history_init("/home/jmederos/bsh_history");
+    history_load();
+}
+
+void close_session()
+{
+    history_save();
+    xmem_free();
 }

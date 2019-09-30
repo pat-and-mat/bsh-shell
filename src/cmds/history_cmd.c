@@ -35,7 +35,7 @@ bool history_cmd_run(struct cmd *c)
     if (vector_count(history->base.args) == 1)
     {
         for (int i = 0; i < history_count(); i++)
-            printf("%d - %s", i, history_get(i));
+            printf("%d - %s\n", i, history_get(i));
 
         dup2(saved_stdout, STDOUT_FILENO);
         close(saved_stdout);

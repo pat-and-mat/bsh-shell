@@ -1,7 +1,8 @@
 #ifndef HISTORY_H
 #define HISTORY_H
 
-void history_set_filename(char *filename);
+void history_init(char *filename);
+void history_set_histn(int histn);
 void history_load();
 void history_save();
 void history_add(char *cmd_line);

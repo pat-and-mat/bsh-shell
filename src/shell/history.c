@@ -36,11 +36,14 @@ void history_load()
     FILE *hist_stream = fopen(history.file, "r");
     char *line = NULL;
     size_t len = 0;
-    while (getline(&line, &len, hist_stream))
+    while (getline(&line, &len, hist_stream) != -1)
     {
         xmem_add_manually_allocated(line);
-        line[strlen(line) - 1] = '\0';
-        history_add(line);
+        if (strlen(line) == 0 || line[0] != '>')
+            continue;
+        if (line[strlen(line) - 1] == '\n')
+            line[strlen(line) - 1] = '\0';
+        history_add(line + 1);
         line = NULL;
         len = 0;
     }
@@ -50,10 +53,10 @@ void history_load()
 
 void history_save()
 {
-    FILE *hist_stream = fopen(history.file, "a");
+    FILE *hist_stream = fopen(history.file, "w");
 
     for (int i = 0; i < vector_count(history.commands); i++)
-        fprintf(hist_stream, "%s\n", (char *)vector_get(history.commands, i));
+        fprintf(hist_stream, ">%s\n", (char *)vector_get(history.commands, i));
 
     fclose(hist_stream);
 }
