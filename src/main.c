@@ -14,13 +14,13 @@
 
 int main(int argc, char *argv[])
 {
+    xmem_init();
+
     char *line;
     size_t len;
 
     while (true)
     {
-        xmem_init();
-
         line = NULL;
         len = 0;
 
@@ -28,28 +28,32 @@ int main(int argc, char *argv[])
 
         getline(&line, &len, stdin);
         xmem_add_manually_allocated(line);
+        if (strlen(line) == 0)
+        {
+            printf("exit\n");
+            break;
+        }
 
         struct text_stream *text_stream;
         struct token_stream *token_stream;
         struct cmd *cmd;
 
         if (!preprocessor_preprocess(text_stream_init(line), &text_stream))
-            printf("Preprocessing failed");
+            fprintf(stderr, "Preprocessing failed");
         else if (!tokenizer_tokenize(text_stream, &token_stream))
-            printf("Lexical analysis failed\n");
+            fprintf(stderr, "Lexical analysis failed\n");
         else if (!parser_parse(token_stream, &cmd))
-            printf("Syntax analysis failed\n");
+            fprintf(stderr, "Syntax analysis failed\n");
         else if (cmd != NULL)
         {
             cmd_print(cmd);
             printf("\n");
 
             if (!cmd_run(cmd))
-                printf("Command execution failed\n");
+                fprintf(stderr, "Command execution failed\n");
         }
-
-        xmem_free();
     }
 
+    xmem_free();
     return 0;
 }
