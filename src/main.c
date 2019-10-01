@@ -20,6 +20,8 @@ int main(int argc, char *argv[])
 {
     open_session();
 
+    bool last_cmd_status = true;
+
     char *line;
     size_t len;
 
@@ -28,7 +30,7 @@ int main(int argc, char *argv[])
         line = NULL;
         len = 0;
 
-        print_minimalistic_prompt();
+        print_minimalistic_prompt(last_cmd_status);
 
         getline(&line, &len, stdin);
         xmem_add_manually_allocated(line);
@@ -54,7 +56,7 @@ int main(int argc, char *argv[])
             printf("\n");
 
             if (!cmd_run(cmd))
-                fprintf(stderr, "Command execution failed\n");
+                last_cmd_status = false;
         }
     }
 
