@@ -43,7 +43,8 @@ void sep_cmd_set_right(struct sep_cmd *c, struct cmd *right)
 
 bool sep_cmd_run(struct cmd *c)
 {
-    return true;
+    struct sep_cmd *sep = (struct sep_cmd *)c;
+    return (sep->left && !cmd_run(sep->left)) || (sep->right && !cmd_run(sep->right));
 }
 
 void sep_cmd_print(struct cmd *c)
