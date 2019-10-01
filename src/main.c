@@ -5,6 +5,7 @@
 
 #include <shell/minimalistic_prompt.h>
 #include <shell/history.h>
+#include <shell/background.h>
 #include <compiler/text_stream.h>
 #include <compiler/token_stream.h>
 #include <compiler/preprocessor.h>
@@ -37,6 +38,7 @@ int main(int argc, char *argv[])
         xmem_add_manually_allocated(line);
         if (strlen(line) == 0)
         {
+            bg_clean_all();
             printf("exit\n");
             break;
         }
@@ -60,6 +62,8 @@ int main(int argc, char *argv[])
             if (!cmd_run(cmd))
                 last_cmd_status = false;
         }
+
+        bg_clean_finished();
     }
 
     close_session();
@@ -71,6 +75,7 @@ void open_session()
     xmem_init();
     history_init("/tmp/bsh_history");
     history_load();
+    bg_init();
 }
 
 void close_session()

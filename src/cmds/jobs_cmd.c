@@ -5,6 +5,7 @@
 #include <sys/types.h>
 #include <pwd.h>
 
+#include <shell/background.h>
 #include <cmds/cmd.h>
 #include <cmds/jobs_cmd.h>
 #include <utils/vector.h>
@@ -35,8 +36,14 @@ bool jobs_cmd_run(struct cmd *c)
         return false;
     }
 
-    if (true)
+    if (vector_count(jobs->base.args) == 1)
     {
+        struct bg_process *process;
+        for (int i = 0; i < bg_count(); i++)
+        {
+            process = bg_get(i);
+            printf("pid: %d command:%s", process->pid, process->cmd_name);
+        }
         simple_cmd_close_redirects(c);
         return true;
     }
