@@ -1,6 +1,9 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <unistd.h>
+#include <wait.h>
 
 #include <cmds/cmd.h>
 #include <cmds/pipe_cmd.h>
@@ -42,7 +45,55 @@ void pipe_cmd_set_right(struct pipe_cmd *c, struct cmd *right)
 
 bool pipe_cmd_run(struct cmd *c)
 {
-    return true;
+    struct pipe_cmd *pipe_cmd = (struct pipe_cmd *)c;
+
+    int pipefd[2];
+    pipe(pipefd);
+
+    pid_t pid_left = fork();
+
+    if (pid_left == -1)
+    {
+        close(pipefd[0]);
+        close(pipefd[1]);
+        return false;
+    }
+
+    if (!pid_left)
+    {
+        close(pipefd[0]);
+        if (dup2(pipefd[1], STDOUT_FILENO) == -1 || !cmd_run(pipe_cmd->left))
+            exit(EXIT_FAILURE);
+        exit(EXIT_SUCCESS);
+    }
+
+    pid_t pid_right = fork();
+
+    if (pid_right == -1)
+    {
+        close(pipefd[0]);
+        close(pipefd[1]);
+        return false;
+    }
+
+    if (!pid_right)
+    {
+        close(pipefd[1]);
+        if (dup2(pipefd[0], STDIN_FILENO) == -1 || !cmd_run(pipe_cmd->right))
+            exit(EXIT_FAILURE);
+        exit(EXIT_SUCCESS);
+    }
+
+    close(pipefd[0]);
+    close(pipefd[1]);
+
+    int right_status;
+    int left_status;
+
+    waitpid(pid_left, &left_status, 0);
+    waitpid(pid_right, &right_status, 0);
+    return WIFEXITED(left_status) && WEXITSTATUS(left_status) == EXIT_SUCCESS &&
+           WIFEXITED(right_status) && WEXITSTATUS(right_status) == EXIT_SUCCESS;
 }
 
 void pipe_cmd_print(struct cmd *c)
