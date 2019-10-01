@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
         struct cmd *cmd;
 
         if (!preprocessor_preprocess(text_stream_init(line), &text_stream))
-            fprintf(stderr, "Preprocessing failed");
+            fprintf(stderr, "Preprocessing failed\n");
         else if (!tokenizer_tokenize(text_stream, &token_stream))
             fprintf(stderr, "Lexical analysis failed\n");
         else if (!parser_parse(token_stream, &cmd))

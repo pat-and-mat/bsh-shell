@@ -48,7 +48,7 @@ int (*states[MAX_STATE + 1])(struct text_stream *, struct vector *);
 
 bool is_in_alphabet(char c);
 
-void states_init()
+void tokenizer_states_init()
 {
     states[STATE_START] = tokenizer_state_start;
     states[STATE_EOF] = tokenizer_state_eof;
@@ -68,7 +68,7 @@ void states_init()
 
 bool tokenizer_tokenize(struct text_stream *t, struct token_stream **out)
 {
-    states_init();
+    tokenizer_states_init();
     struct vector *tokens = vector_init();
 
     int state = STATE_START;
