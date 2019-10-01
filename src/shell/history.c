@@ -39,11 +39,12 @@ void history_load()
     while (getline(&line, &len, hist_stream) != -1)
     {
         xmem_add_manually_allocated(line);
-        if (strlen(line) == 0 || line[0] != '>')
-            continue;
-        if (line[strlen(line) - 1] == '\n')
-            line[strlen(line) - 1] = '\0';
-        history_add(line + 1);
+        if (strlen(line) > 0 && line[0] == '>')
+        {
+            if (line[strlen(line) - 1] == '\n')
+                line[strlen(line) - 1] = '\0';
+            history_add(line + 1);
+        }
         line = NULL;
         len = 0;
     }
@@ -63,7 +64,7 @@ void history_save()
         fclose(hist_stream);
     }
     else
-        printf("Could not save history\n");
+        fprintf(stderr, "Could not save history\n");
 }
 
 void history_add(char *cmd_line)
