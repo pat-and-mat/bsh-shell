@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <signal.h>
 
 #include <shell/minimalistic_prompt.h>
 #include <shell/history.h>
@@ -76,6 +77,13 @@ void open_session()
     history_init("/tmp/bsh_history");
     history_load();
     bg_init();
+
+    // Ignore Ctrl + Z
+    signal(SIGTSTP, SIG_IGN);
+    // Ignore Ctrl + C
+    signal(SIGINT, SIG_IGN);
+    // Ignore Ctrl + /
+    signal(SIGQUIT, SIG_IGN);
 }
 
 void close_session()
