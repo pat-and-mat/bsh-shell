@@ -12,6 +12,7 @@
 #include <compiler/parser.h>
 #include <cmds/cmd.h>
 #include <utils/xmemory.h>
+#include <utils/colors.h>
 
 void open_session();
 void close_session();
@@ -52,6 +53,7 @@ int main(int argc, char *argv[])
             fprintf(stderr, "Syntax analysis failed\n");
         else if (cmd != NULL)
         {
+            printf("%sbsh> %s", build_fg_color(COLOR_GREEN), COLOR_RESET);
             cmd_print(cmd);
             printf("\n");
 
