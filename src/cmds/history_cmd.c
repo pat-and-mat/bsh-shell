@@ -9,6 +9,7 @@
 #include <cmds/history_cmd.h>
 #include <utils/vector.h>
 #include <utils/xmemory.h>
+#include <shell/history.h>
 
 struct history_cmd *history_cmd_init()
 {
@@ -25,7 +26,26 @@ void history_cmd_init_allocated(struct history_cmd *c)
 
 bool history_cmd_run(struct cmd *c)
 {
-    return true;
+    struct history_cmd *history = (struct history_cmd *)c;
+
+    int saved_stdout = dup(STDOUT_FILENO);
+
+    for (int i = 0; i < vector_count(history->base.redirects); i++)
+        cmd_run(vector_get(history->base.redirects, i));
+
+    if (vector_count(history->base.args) == 1)
+    {
+        for (int i = 0; i < history_count(); i++)
+            printf("%d - %s\n", i, history_get(i));
+
+        dup2(saved_stdout, STDOUT_FILENO);
+        close(saved_stdout);
+        return true;
+    }
+
+    dup2(saved_stdout, STDOUT_FILENO);
+    close(saved_stdout);
+    return false;
 }
 
 void history_cmd_print(struct cmd *c)
