@@ -3,7 +3,7 @@
 #include <string.h>
 #include <stdbool.h>
 
-#include <shell/prompt.h>
+#include <shell/minimalistic_prompt.h>
 #include <shell/history.h>
 #include <compiler/text_stream.h>
 #include <compiler/token_stream.h>
@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
         line = NULL;
         len = 0;
 
-        print_prompt();
+        print_minimalistic_prompt();
 
         getline(&line, &len, stdin);
         xmem_add_manually_allocated(line);
