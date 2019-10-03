@@ -26,8 +26,9 @@ void jobs_bg_clean_all();
 void jobs_bg_clean_finished();
 
 struct job *jobs_bg_to_fg(pid_t pid);
+void jobs_fg_to_bg();
 
 void jobs_set_fg(pid_t pid, char *name);
-struct job jobs_get_fg();
+struct job *jobs_get_fg();
 
 #endif

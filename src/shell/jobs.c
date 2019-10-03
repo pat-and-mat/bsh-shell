@@ -6,14 +6,12 @@
 #include <utils/xmemory.h>
 
 struct vector bg_processes;
-struct job fg_process;
+struct job *fg_process;
 
 void jobs_init()
 {
     vector_init_allocated(&bg_processes);
-    fg_process.pid = -1;
-    fg_process.cmd = NULL;
-    fg_process.status = JOB_STATUS_DONE;
+    fg_process = NULL;
 }
 
 struct job *jobs_job_init(pid_t pid, char *name);
@@ -94,13 +92,18 @@ struct job *jobs_bg_to_fg(pid_t pid)
     return NULL;
 }
 
-void jobs_set_fg(pid_t pid, char *name)
+void jobs_fg_to_bg()
 {
-    fg_process.pid = pid;
-    fg_process.cmd = name;
+    jobs_bg_add(fg_process->pid, "<cmd name>");
+    vector_add(&bg_processes, fg_process);
 }
 
-struct job jobs_get_fg()
+void jobs_set_fg(pid_t pid, char *name)
+{
+    fg_process = jobs_job_init(pid, name);
+}
+
+struct job *jobs_get_fg()
 {
     return fg_process;
 }
