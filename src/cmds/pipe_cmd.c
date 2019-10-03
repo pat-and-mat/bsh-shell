@@ -56,7 +56,8 @@ bool pipe_cmd_run(struct cmd *c, bool is_root)
 
     if (!pid_right)
     {
-        setpgid(0, 0);
+        if (setpgid(0, 0) == -1)
+            exit(EXIT_FAILURE);
         pipe_run_pipe_main(pipe_cmd);
     }
 

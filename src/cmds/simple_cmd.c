@@ -65,7 +65,7 @@ bool simple_cmd_run(struct cmd *c, bool is_root)
     args[vector_count(simple->args)] = NULL;
 
     if (!pid &&
-        ((is_root && !setpgid(0, 0)) ||
+        ((is_root && setpgid(0, 0) == -1) ||
          execvp((char *)vector_get(simple->args, 0), args) == -1))
         exit(EXIT_FAILURE);
 
