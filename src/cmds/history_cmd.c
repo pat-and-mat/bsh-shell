@@ -21,30 +21,32 @@ struct history_cmd *history_cmd_init()
 void history_cmd_init_allocated(struct history_cmd *c)
 {
     simple_cmd_init_allocated(&c->base, "history");
-    cmd_init_allocated((struct cmd *)(&c->base), CMD_T_CD, history_cmd_run, history_cmd_print);
+    cmd_init_allocated((struct cmd *)(&c->base), CMD_T_CD,
+                       history_cmd_run,
+                       history_cmd_run,
+                       history_cmd_print);
 }
 
-bool history_cmd_run(struct cmd *c, bool is_root)
+bool history_cmd_run(struct cmd *c)
 {
     struct history_cmd *history = (struct history_cmd *)c;
 
-    int saved_stdout = dup(STDOUT_FILENO);
-
-    for (int i = 0; i < vector_count(history->base.redirects); i++)
-        cmd_run(vector_get(history->base.redirects, i), is_root);
+    if (!simple_cmd_open_redirects(c))
+    {
+        simple_cmd_close_redirects(c);
+        return false;
+    }
 
     if (vector_count(history->base.args) == 1)
     {
         for (int i = 0; i < history_count(); i++)
             printf("%d - %s\n", i, history_get(i));
 
-        dup2(saved_stdout, STDOUT_FILENO);
-        close(saved_stdout);
+        simple_cmd_close_redirects(c);
         return true;
     }
 
-    dup2(saved_stdout, STDOUT_FILENO);
-    close(saved_stdout);
+    simple_cmd_close_redirects(c);
     return false;
 }
 

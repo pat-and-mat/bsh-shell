@@ -11,7 +11,7 @@ struct history_cmd
 struct history_cmd *history_cmd_init();
 void history_cmd_init_allocated(struct history_cmd *c);
 
-bool history_cmd_run(struct cmd *c, bool is_root);
+bool history_cmd_run(struct cmd *c);
 void history_cmd_print(struct cmd *c);
 
 #endif
