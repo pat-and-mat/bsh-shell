@@ -11,7 +11,7 @@ struct right_cmd
 struct right_cmd *right_cmd_init(char *filename);
 void right_cmd_init_allocated(struct right_cmd *c, char *filename);
 
-bool right_cmd_run(struct cmd *c, bool is_root);
+bool right_cmd_run(struct cmd *c);
 void right_cmd_print(struct cmd *c);
 
 #endif

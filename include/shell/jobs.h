@@ -20,9 +20,7 @@ struct job
 };
 
 void jobs_bg_add(pid_t pid, char *name);
-struct job *jobs_bg_get(int i);
 bool jobs_bg_contains(pid_t pid);
-int jobs_bg_count();
 
 void jobs_bg_clean_all();
 void jobs_bg_clean_finished();
@@ -41,5 +39,9 @@ bool jobs_run_fg(struct cmd *c);
 bool jobs_run_bg(struct cmd *c);
 
 bool jobs_bg_to_fg(pid_t pid);
+
+int jobs_count();
+struct job *jobs_get(int i);
+char *jobs_format_status(int status);
 
 #endif

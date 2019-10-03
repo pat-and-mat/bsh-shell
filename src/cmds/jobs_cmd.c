@@ -21,14 +21,15 @@ struct jobs_cmd *jobs_cmd_init()
 void jobs_cmd_init_allocated(struct jobs_cmd *c)
 {
     simple_cmd_init_allocated(&c->base, "jobs");
-    cmd_init_allocated((struct cmd *)(&c->base), CMD_T_CD, jobs_cmd_run, jobs_cmd_print);
+    cmd_init_allocated((struct cmd *)(&c->base), CMD_T_CD,
+                       jobs_cmd_run,
+                       jobs_cmd_run,
+                       jobs_cmd_print);
 }
 
-bool jobs_cmd_run(struct cmd *c, bool is_root)
+bool jobs_cmd_run(struct cmd *c)
 {
     struct jobs_cmd *jobs = (struct jobs_cmd *)c;
-
-    int saved_stdout = dup(STDOUT_FILENO);
 
     if (!simple_cmd_open_redirects(c))
     {
@@ -39,10 +40,10 @@ bool jobs_cmd_run(struct cmd *c, bool is_root)
     if (vector_count(jobs->base.args) == 1)
     {
         struct job *job;
-        for (int i = 0; i < jobs_bg_count(); i++)
+        for (int i = 0; i < jobs_count(); i++)
         {
-            job = jobs_bg_get(i);
-            printf("pid: %d command:%s", job->pid, job->cmd);
+            job = jobs_get(i);
+            printf("pid: %d status: %s command: %s", job->pid, jobs_format_status(job->status), job->cmd);
         }
         simple_cmd_close_redirects(c);
         return true;

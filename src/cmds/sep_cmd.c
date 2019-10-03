@@ -16,7 +16,10 @@ struct sep_cmd *sep_cmd_init()
 
 void sep_cmd_init_allocated(struct sep_cmd *c)
 {
-    cmd_init_allocated(&c->base, CMD_T_SEP_CMD, sep_cmd_run, sep_cmd_print);
+    cmd_init_allocated(&c->base, CMD_T_SEP_CMD,
+                       sep_cmd_run,
+                       NULL,
+                       sep_cmd_print);
     c->left = NULL;
     c->right = NULL;
 }
@@ -41,10 +44,15 @@ void sep_cmd_set_right(struct sep_cmd *c, struct cmd *right)
     c->right = right;
 }
 
-bool sep_cmd_run(struct cmd *c, bool is_root)
+bool sep_cmd_run(struct cmd *c)
 {
     struct sep_cmd *sep = (struct sep_cmd *)c;
-    return (sep->left && !cmd_run(sep->left, is_root)) || (sep->right && !cmd_run(sep->right, is_root));
+
+    bool result = true;
+    result = result && cmd_run_job(sep->left);
+    result = result && (!sep->right || cmd_run_job(sep->right));
+
+    return result;
 }
 
 void sep_cmd_print(struct cmd *c)

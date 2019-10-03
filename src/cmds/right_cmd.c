@@ -19,10 +19,13 @@ struct right_cmd *right_cmd_init(char *filename)
 void right_cmd_init_allocated(struct right_cmd *c, char *filename)
 {
     redirect_cmd_init_allocated(&c->base, filename);
-    cmd_init_allocated((struct cmd *)&c->base, CMD_T_LEFT_CMD, right_cmd_run, right_cmd_print);
+    cmd_init_allocated((struct cmd *)&c->base, CMD_T_LEFT_CMD,
+                       right_cmd_run,
+                       right_cmd_run,
+                       right_cmd_print);
 }
 
-bool right_cmd_run(struct cmd *c, bool is_root)
+bool right_cmd_run(struct cmd *c)
 {
     struct right_cmd *right = (struct right_cmd *)c;
 

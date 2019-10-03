@@ -49,7 +49,12 @@ void bg_cmd_set_right(struct bg_cmd *c, struct cmd *right)
 bool bg_cmd_run_job(struct cmd *c)
 {
     struct bg_cmd *bg = (struct bg_cmd *)c;
-    return jobs_run_bg(bg->left) && cmd_run_job(bg->right);
+
+    bool result = true;
+    result = result && jobs_run_bg(bg->left);
+    result = result && (!bg->right || cmd_run_job(bg->right));
+
+    return result;
 }
 
 void bg_cmd_print(struct cmd *c)

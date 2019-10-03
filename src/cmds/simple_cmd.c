@@ -89,7 +89,7 @@ bool simple_cmd_open_redirects(struct cmd *c)
     simple->saved_stdout = dup(STDOUT_FILENO);
 
     for (int i = 0; i < vector_count(simple->redirects); i++)
-        if (!cmd_run((struct cmd *)vector_get(simple->redirects, i), -1))
+        if (!cmd_run_process((struct cmd *)vector_get(simple->redirects, i)))
             return false;
     return true;
 }
