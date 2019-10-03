@@ -4,7 +4,6 @@
 #include <stdbool.h>
 #include <unistd.h>
 #include <sys/types.h>
-#include <libgen.h>
 #include <wait.h>
 
 #include <cmds/cmd.h>
@@ -23,7 +22,10 @@ struct simple_cmd *simple_cmd_init(char *cmd)
 
 void simple_cmd_init_allocated(struct simple_cmd *c, char *cmd)
 {
-    cmd_init_allocated(&c->base, CMD_T_SIMPLE_CMD, simple_cmd_run, simple_cmd_print);
+    cmd_init_allocated(&c->base, CMD_T_SIMPLE_CMD,
+                       jobs_run_fg,
+                       simple_cmd_run_process,
+                       simple_cmd_print);
     c->args = vector_init();
     c->redirects = vector_init();
     c->saved_stdin = -1;
@@ -41,7 +43,7 @@ void simple_cmd_add_redirect(struct simple_cmd *c, struct cmd *redirect)
     vector_add(c->redirects, redirect);
 }
 
-bool simple_cmd_run(struct cmd *c, bool is_root)
+bool simple_cmd_run_process(struct cmd *c)
 {
     struct simple_cmd *simple = (struct simple_cmd *)c;
 
@@ -58,32 +60,25 @@ bool simple_cmd_run(struct cmd *c, bool is_root)
         return false;
     }
 
-    char *args[vector_count(simple->args) + 1];
-    args[0] = basename((char *)vector_get(simple->args, 0));
-    for (int i = 1; i < vector_count(simple->args) + 1; i++)
-        args[i] = (char *)vector_get(simple->args, i);
-    args[vector_count(simple->args)] = NULL;
+    if (!pid)
+    {
+        char *args[vector_count(simple->args) + 1];
+        args[0] = basename((char *)vector_get(simple->args, 0));
+        for (int i = 1; i < vector_count(simple->args) + 1; i++)
+            args[i] = (char *)vector_get(simple->args, i);
+        args[vector_count(simple->args)] = NULL;
 
-    if (!pid &&
-        ((is_root && setpgid(0, 0) == -1) ||
-         execvp((char *)vector_get(simple->args, 0), args) == -1))
-        exit(EXIT_FAILURE);
+        if (setpgid(0, 0) == -1)
+            exit(EXIT_FAILURE);
+        if (execvp((char *)vector_get(simple->args, 0), args) == -1)
+            exit(EXIT_FAILURE);
+    }
 
     int status;
-    int flags = 0;
-    if (is_root)
-    {
-        flags = WUNTRACED;
-        jobs_set_fg(pid, "<cmd name>");
-    }
-    waitpid(pid, &status, flags);
-
+    waitpid(pid, &status, 0);
     simple_cmd_close_redirects(c);
 
-    if (WIFSIGNALED(status) || (WIFEXITED(status) && WEXITSTATUS(status) == EXIT_FAILURE))
-        return false;
-
-    return true;
+    return WIFEXITED(status) && WEXITSTATUS(status) == EXIT_SUCCESS;
 }
 
 bool simple_cmd_open_redirects(struct cmd *c)

@@ -4,6 +4,7 @@
 #include <shell/jobs.h>
 #include <utils/vector.h>
 #include <utils/xmemory.h>
+#include <shell/info.h>
 
 struct vector bg_processes;
 struct job *fg_process;
@@ -106,4 +107,43 @@ void jobs_set_fg(pid_t pid, char *name)
 struct job *jobs_get_fg()
 {
     return fg_process;
+}
+
+// New
+
+bool cmd_default_run_job_fg(struct cmd *c)
+{
+    tcgetattr(shell_terminal, &shell_tmodes);
+    tcsetattr(shell_terminal, TCSADRAIN, &default_tmodes);
+
+    pid_t job_pid = fork();
+    if (job_pid == -1)
+    {
+        tcsetattr(shell_terminal, TCSADRAIN, &shell_tmodes);
+        return false;
+    }
+
+    if (!job_pid)
+    {
+        setpgid(0, 0);
+        tcsetpgrp(shell_terminal, getpgrp());
+        if (!simple_cmd_run_process(c))
+            exit(EXIT_FAILURE);
+        exit(EXIT_SUCCESS);
+    }
+
+    setpgid(job_pid, job_pid);
+    tcsetpgrp(shell_terminal, job_pid);
+
+    bool job_status = wait_for_job(job_pid);
+
+    tcsetpgrp(shell_terminal, getpgrp());
+    tcsetattr(shell_terminal, TCSADRAIN, &shell_tmodes);
+
+    return job_status;
+}
+
+bool cmd_default_run_job_bg(struct cmd *c)
+{
+    return true;
 }

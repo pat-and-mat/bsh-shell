@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include <sys/types.h>
+#include <termios.h>
 
 #define JOB_STATUS_RUNNING 1
 #define JOB_STATUS_STOPPED 2
@@ -13,9 +14,9 @@ struct job
     pid_t pid;
     int status;
     char *cmd;
+    struct termios tmodes;
+    bool notified;
 };
-
-void jobs_init();
 
 void jobs_bg_add(pid_t pid, char *name);
 struct job *jobs_bg_get(int i);
@@ -30,5 +31,13 @@ void jobs_fg_to_bg();
 
 void jobs_set_fg(pid_t pid, char *name);
 struct job *jobs_get_fg();
+
+// New functions
+
+void jobs_init();
+bool wait_for_job(pid_t pid);
+
+bool jobs_run_fg(struct cmd *c);
+bool jobs_run_bg(struct cmd *c);
 
 #endif

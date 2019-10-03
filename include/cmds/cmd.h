@@ -15,13 +15,18 @@
 struct cmd
 {
     int type;
-    bool (*run)(struct cmd *c, bool is_root);
+    bool (*run_job)(struct cmd *c);
+    bool (*run_process)(struct cmd *c);
     void (*print)(struct cmd *c);
 };
 
-void cmd_init_allocated(struct cmd *c, int type, bool (*run)(struct cmd *c, bool is_root), void (*print)(struct cmd *c));
+void cmd_init_allocated(struct cmd *c, int type,
+                        bool (*run_job)(struct cmd *c),
+                        bool (*run_process)(struct cmd *c),
+                        void (*print)(struct cmd *c));
 int cmd_get_type(struct cmd *c);
-bool cmd_run(struct cmd *c, bool is_root);
+bool cmd_run_job(struct cmd *c);
+bool cmd_run_process(struct cmd *c);
 void cmd_print(struct cmd *c);
 
 #endif
