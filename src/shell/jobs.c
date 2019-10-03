@@ -62,6 +62,19 @@ bool jobs_run_fg(struct cmd *c)
     return job_status;
 }
 
+bool wait_for_job(struct job *job)
+{
+    int status;
+    waitpid(job->pid, &status, WUNTRACED);
+    if (WIFSTOPPED(status))
+    {
+        job->status = JOB_STATUS_STOPPED;
+        vector_add(&jobs, job);
+        return true;
+    }
+    return WIFEXITED(status) && WEXITSTATUS(status) == EXIT_SUCCESS;
+}
+
 bool jobs_run_bg(struct cmd *c)
 {
     pid_t job_pid = fork();
@@ -86,21 +99,6 @@ bool jobs_run_bg(struct cmd *c)
 
     return true;
 }
-
-bool wait_for_job(struct job *job)
-{
-    int status;
-    waitpid(job->pid, &status, WUNTRACED);
-    if (WIFSTOPPED(status))
-    {
-        job->status = JOB_STATUS_STOPPED;
-        vector_add(&jobs, job);
-        return true;
-    }
-    return WIFEXITED(status) && WEXITSTATUS(status) == EXIT_SUCCESS;
-}
-
-bool jobs_bg_to_fg(pid_t pid);
 
 int jobs_count()
 {
