@@ -23,14 +23,15 @@ struct fg_cmd *fg_cmd_init()
 void fg_cmd_init_allocated(struct fg_cmd *c)
 {
     simple_cmd_init_allocated(&c->base, "fg");
-    cmd_init_allocated((struct cmd *)(&c->base), CMD_T_CD, fg_cmd_run, fg_cmd_print);
+    cmd_init_allocated((struct cmd *)(&c->base), CMD_T_CD,
+                       fg_cmd_run,
+                       fg_cmd_run,
+                       fg_cmd_print);
 }
 
-bool fg_cmd_run(struct cmd *c, bool is_root)
+bool fg_cmd_run(struct cmd *c)
 {
     struct fg_cmd *fg = (struct fg_cmd *)c;
-
-    int saved_stdout = dup(STDOUT_FILENO);
 
     if (!simple_cmd_open_redirects(c))
     {
@@ -48,21 +49,9 @@ bool fg_cmd_run(struct cmd *c, bool is_root)
             return false;
         }
 
-        struct job *job = jobs_bg_to_fg(pid);
-        if (!job)
-        {
-            simple_cmd_close_redirects(c);
-            return false;
-        }
-
+        bool status = jobs_bg_to_fg(pid);
         simple_cmd_close_redirects(c);
-
-        int status;
-        int flags = 0;
-        if (is_root)
-            flags = WUNTRACED;
-        waitpid(job->pid, &status, flags);
-        return WIFSTOPPED(status) || (WIFEXITED(status) && WEXITSTATUS(status) == EXIT_SUCCESS);
+        return status;
     }
 
     simple_cmd_close_redirects(c);

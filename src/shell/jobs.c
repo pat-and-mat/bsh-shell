@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdbool.h>
 #include <signal.h>
 #include <wait.h>
 #include <shell/jobs.h>
@@ -77,22 +78,6 @@ void jobs_bg_clean_finished()
     }
 }
 
-struct job *jobs_bg_to_fg(pid_t pid)
-{
-    struct job *job;
-    for (int i = 0; i < vector_count(&bg_processes); i++)
-    {
-        job = (struct job *)vector_get(&bg_processes, i);
-        if (job->pid == pid)
-        {
-            vector_delete(&bg_processes, i);
-            jobs_set_fg(job->pid, job->cmd);
-            return job;
-        }
-    }
-    return NULL;
-}
-
 void jobs_fg_to_bg()
 {
     jobs_bg_add(fg_process->pid, "<cmd name>");
@@ -111,7 +96,7 @@ struct job *jobs_get_fg()
 
 // New
 
-bool cmd_default_run_job_fg(struct cmd *c)
+bool jobs_run_fg(struct cmd *c)
 {
     tcgetattr(shell_terminal, &shell_tmodes);
     tcsetattr(shell_terminal, TCSADRAIN, &default_tmodes);
@@ -143,7 +128,24 @@ bool cmd_default_run_job_fg(struct cmd *c)
     return job_status;
 }
 
-bool cmd_default_run_job_bg(struct cmd *c)
+bool jobs_run_bg(struct cmd *c)
 {
+    return true;
+}
+
+bool jobs_bg_to_fg(pid_t pid)
+{
+    // struct job *job;
+    // for (int i = 0; i < vector_count(&bg_processes); i++)
+    // {
+    //     job = (struct job *)vector_get(&bg_processes, i);
+    //     if (job->pid == pid)
+    //     {
+    //         vector_delete(&bg_processes, i);
+    //         jobs_set_fg(job->pid, job->cmd);
+    //         return job;
+    //     }
+    // }
+    // return NULL;
     return true;
 }

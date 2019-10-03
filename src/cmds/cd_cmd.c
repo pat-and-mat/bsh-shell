@@ -30,8 +30,6 @@ bool cd_cmd_run(struct cmd *c)
 {
     struct cd_cmd *cd = (struct cd_cmd *)c;
 
-    int saved_stdout = dup(STDOUT_FILENO);
-
     if (!simple_cmd_open_redirects(c))
     {
         simple_cmd_close_redirects(c);

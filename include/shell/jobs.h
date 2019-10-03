@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <sys/types.h>
 #include <termios.h>
+#include <cmds/cmd.h>
 
 #define JOB_STATUS_RUNNING 1
 #define JOB_STATUS_STOPPED 2
@@ -26,7 +27,6 @@ int jobs_bg_count();
 void jobs_bg_clean_all();
 void jobs_bg_clean_finished();
 
-struct job *jobs_bg_to_fg(pid_t pid);
 void jobs_fg_to_bg();
 
 void jobs_set_fg(pid_t pid, char *name);
@@ -39,5 +39,7 @@ bool wait_for_job(pid_t pid);
 
 bool jobs_run_fg(struct cmd *c);
 bool jobs_run_bg(struct cmd *c);
+
+bool jobs_bg_to_fg(pid_t pid);
 
 #endif
