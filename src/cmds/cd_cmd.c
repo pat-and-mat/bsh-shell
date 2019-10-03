@@ -20,10 +20,13 @@ struct cd_cmd *cd_cmd_init()
 void cd_cmd_init_allocated(struct cd_cmd *c)
 {
     simple_cmd_init_allocated(&c->base, "cd");
-    cmd_init_allocated((struct cmd *)(&c->base), CMD_T_CD, cd_cmd_run, cd_cmd_print);
+    cmd_init_allocated((struct cmd *)(&c->base), CMD_T_CD,
+                       cd_cmd_run,
+                       cd_cmd_run,
+                       cd_cmd_print);
 }
 
-bool cd_cmd_run(struct cmd *c, bool is_root)
+bool cd_cmd_run(struct cmd *c)
 {
     struct cd_cmd *cd = (struct cd_cmd *)c;
 
