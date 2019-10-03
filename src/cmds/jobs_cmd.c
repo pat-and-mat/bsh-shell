@@ -39,10 +39,10 @@ bool jobs_cmd_run(struct cmd *c, bool is_root)
     if (vector_count(jobs->base.args) == 1)
     {
         struct job *job;
-        for (int i = 0; i < bg_count(); i++)
+        for (int i = 0; i < jobs_bg_count(); i++)
         {
-            job = bg_get(i);
-            printf("pid: %d command:%s", job->pid, job->cmd_name);
+            job = jobs_bg_get(i);
+            printf("pid: %d command:%s", job->pid, job->cmd);
         }
         simple_cmd_close_redirects(c);
         return true;

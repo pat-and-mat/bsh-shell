@@ -48,7 +48,7 @@ bool fg_cmd_run(struct cmd *c, bool is_root)
             return false;
         }
 
-        struct job *job = bg_to_fg(pid);
+        struct job *job = jobs_bg_to_fg(pid);
         if (!job)
         {
             simple_cmd_close_redirects(c);
@@ -58,7 +58,10 @@ bool fg_cmd_run(struct cmd *c, bool is_root)
         simple_cmd_close_redirects(c);
 
         int status;
-        waitpid(job->pid, &status, WUNTRACED);
+        int flags = 0;
+        if (is_root)
+            flags = WUNTRACED;
+        waitpid(job->pid, &status, flags);
         return WIFSTOPPED(status) || (WIFEXITED(status) && WEXITSTATUS(status) == EXIT_SUCCESS);
     }
 

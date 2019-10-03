@@ -15,7 +15,7 @@
 struct cmd
 {
     int type;
-    bool (*run)(struct cmd *c);
+    bool (*run)(struct cmd *c, bool is_root);
     void (*print)(struct cmd *c);
 };
 

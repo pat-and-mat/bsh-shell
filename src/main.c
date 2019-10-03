@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
         xmem_add_manually_allocated(line);
         if (strlen(line) == 0)
         {
-            bg_clean_all();
+            jobs_bg_clean_all();
             printf("exit\n");
             break;
         }
@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
             last_cmd_status = cmd_run(cmd, true);
         }
 
-        bg_clean_finished();
+        jobs_bg_clean_finished();
     }
 
     close_session();
@@ -76,7 +76,7 @@ void open_session()
     xmem_init();
     history_init("/tmp/bsh_history");
     history_load();
-    bg_init();
+    jobs_init();
 
     // Ignore Ctrl + Z
     signal(SIGTSTP, sigstp_handler);

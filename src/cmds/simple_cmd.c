@@ -12,6 +12,7 @@
 #include <cmds/redirect_cmd.h>
 #include <utils/vector.h>
 #include <utils/xmemory.h>
+#include <shell/jobs.h>
 
 struct simple_cmd *simple_cmd_init(char *cmd)
 {
@@ -63,11 +64,19 @@ bool simple_cmd_run(struct cmd *c, bool is_root)
         args[i] = (char *)vector_get(simple->args, i);
     args[vector_count(simple->args)] = NULL;
 
-    if (!pid && execvp((char *)vector_get(simple->args, 0), args) == -1)
+    if (!pid &&
+        ((is_root && !setpgid(0, 0)) ||
+         execvp((char *)vector_get(simple->args, 0), args) == -1))
         exit(EXIT_FAILURE);
 
     int status;
-    waitpid(pid, &status, WUNTRACED);
+    int flags = 0;
+    if (is_root)
+    {
+        flags = WUNTRACED;
+        jobs_set_fg(pid, "<cmd name>");
+    }
+    waitpid(pid, &status, flags);
 
     simple_cmd_close_redirects(c);
 

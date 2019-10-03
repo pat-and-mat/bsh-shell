@@ -16,7 +16,7 @@ int cmd_get_type(struct cmd *c)
 
 bool cmd_run(struct cmd *c, bool is_root)
 {
-    return (*c->run)(c);
+    return (*c->run)(c, is_root);
 }
 
 void cmd_print(struct cmd *c)

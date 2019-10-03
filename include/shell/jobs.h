@@ -12,19 +12,22 @@ struct job
 {
     pid_t pid;
     int status;
-    char *cmd_name;
+    char *cmd;
 };
 
 void jobs_init();
-int jobs_bg_count();
+
+void jobs_bg_add(pid_t pid, char *name);
 struct job *jobs_bg_get(int i);
+bool jobs_bg_contains(pid_t pid);
+int jobs_bg_count();
+
 void jobs_bg_clean_all();
 void jobs_bg_clean_finished();
-void jobs_bg_add(pid_t pid, char *name);
-struct job *jobs_bg_to_fg(pid_t pid);
-bool jobs_bg_contains(pid_t pid);
 
-void jobs_set_fg(pid_t gpid, char *name);
+struct job *jobs_bg_to_fg(pid_t pid);
+
+void jobs_set_fg(pid_t pid, char *name);
 struct job jobs_get_fg();
 
 #endif
