@@ -6,6 +6,7 @@
 #include <utils/vector.h>
 #include <utils/xmemory.h>
 #include <shell/info.h>
+#include <utils/sigutils.h>
 
 struct vector bg_processes;
 struct job *fg_process;
@@ -110,6 +111,7 @@ bool jobs_run_fg(struct cmd *c)
 
     if (!job_pid)
     {
+        signals_default();
         setpgid(0, 0);
         tcsetpgrp(shell_terminal, getpgrp());
         if (!simple_cmd_run_process(c))

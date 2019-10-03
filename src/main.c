@@ -15,7 +15,7 @@
 #include <cmds/cmd.h>
 #include <utils/xmemory.h>
 #include <utils/colors.h>
-#include <utils/sighandlers.h>
+#include <utils/sigutils.h>
 
 void open_session();
 void close_session();
@@ -77,13 +77,7 @@ void open_session()
     history_init("/tmp/bsh_history");
     history_load();
     jobs_init();
-
-    // Ignore Ctrl + Z
-    signal(SIGTSTP, sigstp_handler);
-    // Ignore Ctrl + C
-    signal(SIGINT, sigint_handler);
-    // Ignore Ctrl + /
-    signal(SIGQUIT, sigquit_handler);
+    signals_ignore();
 }
 
 void close_session()
