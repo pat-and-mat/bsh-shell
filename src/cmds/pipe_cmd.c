@@ -66,7 +66,7 @@ bool pipe_cmd_run_process(struct cmd *c)
     if (!pid_left)
     {
         close(pipefd[0]);
-        if (dup2(pipefd[1], STDOUT_FILENO) == -1 || !cmd_run(pipe_cmd->left))
+        if (dup2(pipefd[1], STDOUT_FILENO) == -1 || !cmd_run_process(pipe_cmd->left))
             exit(EXIT_FAILURE);
         exit(EXIT_SUCCESS);
     }
@@ -83,7 +83,7 @@ bool pipe_cmd_run_process(struct cmd *c)
     if (!pid_right)
     {
         close(pipefd[1]);
-        if (dup2(pipefd[0], STDIN_FILENO) == -1 || !cmd_run(pipe_cmd->right))
+        if (dup2(pipefd[0], STDIN_FILENO) == -1 || !cmd_run_process(pipe_cmd->right))
             exit(EXIT_FAILURE);
         exit(EXIT_SUCCESS);
     }

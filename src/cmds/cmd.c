@@ -26,7 +26,7 @@ bool cmd_run_job(struct cmd *c)
     return (*c->run_job)(c);
 }
 
-bool cmd_run_job(struct cmd *c)
+bool cmd_run_process(struct cmd *c)
 {
     return (*c->run_process)(c);
 }

@@ -18,7 +18,7 @@ void sep_cmd_init_allocated(struct sep_cmd *c)
 {
     cmd_init_allocated(&c->base, CMD_T_SEP_CMD,
                        sep_cmd_run,
-                       NULL,
+                       sep_cmd_run,
                        sep_cmd_print);
     c->left = NULL;
     c->right = NULL;

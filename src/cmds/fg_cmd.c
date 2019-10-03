@@ -25,7 +25,7 @@ void fg_cmd_init_allocated(struct fg_cmd *c)
     simple_cmd_init_allocated(&c->base, "fg");
     cmd_init_allocated((struct cmd *)(&c->base), CMD_T_CD,
                        fg_cmd_run,
-                       NULL,
+                       fg_cmd_run,
                        fg_cmd_print);
 }
 

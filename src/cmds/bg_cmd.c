@@ -19,8 +19,8 @@ struct bg_cmd *bg_cmd_init()
 void bg_cmd_init_allocated(struct bg_cmd *c)
 {
     cmd_init_allocated(&c->base, CMD_T_BG_CMD,
-                       bg_cmd_run_job,
-                       NULL,
+                       bg_cmd_run,
+                       bg_cmd_run,
                        bg_cmd_print);
     c->left = NULL;
     c->right = NULL;
@@ -46,7 +46,7 @@ void bg_cmd_set_right(struct bg_cmd *c, struct cmd *right)
     c->right = right;
 }
 
-bool bg_cmd_run_job(struct cmd *c)
+bool bg_cmd_run(struct cmd *c)
 {
     struct bg_cmd *bg = (struct bg_cmd *)c;
 

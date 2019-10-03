@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <unistd.h>
 #include <sys/types.h>
+#include <libgen.h>
 #include <wait.h>
 
 #include <cmds/cmd.h>
@@ -20,6 +21,7 @@ struct simple_cmd *simple_cmd_init(char *cmd)
     return simple_cmd;
 }
 
+bool simple_cmd_run_process(struct cmd *c);
 void simple_cmd_init_allocated(struct simple_cmd *c, char *cmd)
 {
     cmd_init_allocated(&c->base, CMD_T_SIMPLE_CMD,

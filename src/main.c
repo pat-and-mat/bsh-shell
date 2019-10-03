@@ -61,7 +61,7 @@ int main(int argc, char *argv[])
             cmd_print(cmd);
             printf("\n");
 
-            last_cmd_status = cmd_run(cmd, true);
+            last_cmd_status = cmd_run_job(cmd);
         }
 
         jobs_bg_clean_finished();
