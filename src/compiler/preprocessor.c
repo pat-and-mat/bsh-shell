@@ -187,6 +187,7 @@ void str_expand(char **str, char *str1, int *len)
     if (strlen(*str) + strlen(str1) > *len)
         new_str = xrealloc(*str, strlen(*str) + strlen(str1) + 1);
     if (new_str)
-        strcat(*str, str1);
+        strcat(new_str, str1);
     *str = new_str;
+    *len = strlen(*str);
 }

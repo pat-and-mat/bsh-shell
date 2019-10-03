@@ -26,11 +26,13 @@ bool right_append_cmd_run(struct cmd *c, bool is_root)
 {
     struct right_append_cmd *right_append = (struct right_append_cmd *)c;
 
-    right_append->base.fd = open(right_append->base.filename, O_WRONLY | O_CREAT | O_APPEND);
+    right_append->base.fd = open(right_append->base.filename, O_RDWR | O_CREAT | O_APPEND, 0777);
     if (right_append->base.fd == -1)
         return false;
 
-    dup2(right_append->base.fd, STDOUT_FILENO);
+    if (dup2(right_append->base.fd, STDOUT_FILENO) == -1)
+        return false;
+
     return true;
 }
 

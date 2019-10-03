@@ -61,8 +61,7 @@ int main(int argc, char *argv[])
             cmd_print(cmd);
             printf("\n");
 
-            if (!cmd_run(cmd, true))
-                last_cmd_status = false;
+            last_cmd_status = cmd_run(cmd, true);
         }
 
         bg_clean_finished();
