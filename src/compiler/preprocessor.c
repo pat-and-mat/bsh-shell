@@ -189,4 +189,5 @@ void str_expand(char **str, char *str1, int *len)
     if (new_str)
         strcat(new_str, str1);
     *str = new_str;
+    *len = strlen(*str);
 }
