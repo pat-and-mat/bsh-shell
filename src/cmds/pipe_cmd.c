@@ -43,7 +43,7 @@ void pipe_cmd_set_right(struct pipe_cmd *c, struct cmd *right)
     c->right = right;
 }
 
-bool pipe_cmd_run(struct cmd *c)
+bool pipe_cmd_run(struct cmd *c, bool is_root)
 {
     struct pipe_cmd *pipe_cmd = (struct pipe_cmd *)c;
 
@@ -62,7 +62,7 @@ bool pipe_cmd_run(struct cmd *c)
     if (!pid_left)
     {
         close(pipefd[0]);
-        if (dup2(pipefd[1], STDOUT_FILENO) == -1 || !cmd_run(pipe_cmd->left))
+        if (dup2(pipefd[1], STDOUT_FILENO) == -1 || !cmd_run(pipe_cmd->left, false))
             exit(EXIT_FAILURE);
         exit(EXIT_SUCCESS);
     }
@@ -79,7 +79,7 @@ bool pipe_cmd_run(struct cmd *c)
     if (!pid_right)
     {
         close(pipefd[1]);
-        if (dup2(pipefd[0], STDIN_FILENO) == -1 || !cmd_run(pipe_cmd->right))
+        if (dup2(pipefd[0], STDIN_FILENO) == -1 || !cmd_run(pipe_cmd->right, false))
             exit(EXIT_FAILURE);
         exit(EXIT_SUCCESS);
     }

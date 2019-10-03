@@ -11,7 +11,7 @@ struct cd_cmd
 struct cd_cmd *cd_cmd_init();
 void cd_cmd_init_allocated(struct cd_cmd *c);
 
-bool cd_cmd_run(struct cmd *c);
+bool cd_cmd_run(struct cmd *c, bool is_root);
 void cd_cmd_print(struct cmd *c);
 
 #endif

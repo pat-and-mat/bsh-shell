@@ -19,7 +19,7 @@ void sep_cmd_set_left(struct sep_cmd *c, struct cmd *left);
 struct cmd *sep_cmd_get_right(struct sep_cmd *c);
 void sep_cmd_set_right(struct sep_cmd *c, struct cmd *right);
 
-bool sep_cmd_run(struct cmd *c);
+bool sep_cmd_run(struct cmd *c, bool is_root);
 void sep_cmd_print(struct cmd *c);
 
 #endif

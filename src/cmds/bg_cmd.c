@@ -42,7 +42,7 @@ void bg_cmd_set_right(struct bg_cmd *c, struct cmd *right)
     c->right = right;
 }
 
-bool bg_cmd_run(struct cmd *c)
+bool bg_cmd_run(struct cmd *c, bool is_root)
 {
     return true;
 }

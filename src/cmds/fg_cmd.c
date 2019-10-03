@@ -11,7 +11,7 @@
 #include <cmds/fg_cmd.h>
 #include <utils/vector.h>
 #include <utils/xmemory.h>
-#include <shell/background.h>
+#include <shell/jobs.h>
 
 struct fg_cmd *fg_cmd_init()
 {
@@ -26,7 +26,7 @@ void fg_cmd_init_allocated(struct fg_cmd *c)
     cmd_init_allocated((struct cmd *)(&c->base), CMD_T_CD, fg_cmd_run, fg_cmd_print);
 }
 
-bool fg_cmd_run(struct cmd *c)
+bool fg_cmd_run(struct cmd *c, bool is_root)
 {
     struct fg_cmd *fg = (struct fg_cmd *)c;
 
@@ -48,8 +48,8 @@ bool fg_cmd_run(struct cmd *c)
             return false;
         }
 
-        struct bg_process *process = bg_to_fg(pid);
-        if (!process)
+        struct job *job = bg_to_fg(pid);
+        if (!job)
         {
             simple_cmd_close_redirects(c);
             return false;
@@ -58,8 +58,8 @@ bool fg_cmd_run(struct cmd *c)
         simple_cmd_close_redirects(c);
 
         int status;
-        waitpid(process->pid, &status, 0);
-        return WIFEXITED(status) && WEXITSTATUS(status) == EXIT_SUCCESS;
+        waitpid(job->pid, &status, WUNTRACED);
+        return WIFSTOPPED(status) || (WIFEXITED(status) && WEXITSTATUS(status) == EXIT_SUCCESS);
     }
 
     simple_cmd_close_redirects(c);

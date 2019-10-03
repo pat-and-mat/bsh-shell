@@ -41,10 +41,10 @@ void sep_cmd_set_right(struct sep_cmd *c, struct cmd *right)
     c->right = right;
 }
 
-bool sep_cmd_run(struct cmd *c)
+bool sep_cmd_run(struct cmd *c, bool is_root)
 {
     struct sep_cmd *sep = (struct sep_cmd *)c;
-    return (sep->left && !cmd_run(sep->left)) || (sep->right && !cmd_run(sep->right));
+    return (sep->left && !cmd_run(sep->left, is_root)) || (sep->right && !cmd_run(sep->right, is_root));
 }
 
 void sep_cmd_print(struct cmd *c)

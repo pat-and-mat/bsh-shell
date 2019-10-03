@@ -6,7 +6,7 @@
 
 #include <shell/minimalistic_prompt.h>
 #include <shell/history.h>
-#include <shell/background.h>
+#include <shell/jobs.h>
 #include <compiler/text_stream.h>
 #include <compiler/token_stream.h>
 #include <compiler/preprocessor.h>
@@ -15,6 +15,7 @@
 #include <cmds/cmd.h>
 #include <utils/xmemory.h>
 #include <utils/colors.h>
+#include <utils/sighandlers.h>
 
 void open_session();
 void close_session();
@@ -60,7 +61,7 @@ int main(int argc, char *argv[])
             cmd_print(cmd);
             printf("\n");
 
-            if (!cmd_run(cmd))
+            if (!cmd_run(cmd, true))
                 last_cmd_status = false;
         }
 
@@ -79,11 +80,11 @@ void open_session()
     bg_init();
 
     // Ignore Ctrl + Z
-    signal(SIGTSTP, SIG_IGN);
+    signal(SIGTSTP, sigstp_handler);
     // Ignore Ctrl + C
-    signal(SIGINT, SIG_IGN);
+    signal(SIGINT, sigint_handler);
     // Ignore Ctrl + /
-    signal(SIGQUIT, SIG_IGN);
+    signal(SIGQUIT, sigquit_handler);
 }
 
 void close_session()

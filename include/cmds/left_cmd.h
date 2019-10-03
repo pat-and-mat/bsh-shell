@@ -11,7 +11,7 @@ struct left_cmd
 struct left_cmd *left_cmd_init(char *filename);
 void left_cmd_init_allocated(struct left_cmd *c, char *filename);
 
-bool left_cmd_run(struct cmd *c);
+bool left_cmd_run(struct cmd *c, bool is_root);
 void left_cmd_print(struct cmd *c);
 
 #endif

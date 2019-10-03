@@ -11,7 +11,7 @@ struct fg_cmd
 struct fg_cmd *fg_cmd_init();
 void fg_cmd_init_allocated(struct fg_cmd *c);
 
-bool fg_cmd_run(struct cmd *c);
+bool fg_cmd_run(struct cmd *c, bool is_root);
 void fg_cmd_print(struct cmd *c);
 
 #endif

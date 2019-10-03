@@ -22,7 +22,7 @@ void left_cmd_init_allocated(struct left_cmd *c, char *filename)
     cmd_init_allocated((struct cmd *)&c->base, CMD_T_LEFT_CMD, left_cmd_run, left_cmd_print);
 }
 
-bool left_cmd_run(struct cmd *c)
+bool left_cmd_run(struct cmd *c, bool is_root)
 {
     struct left_cmd *left = (struct left_cmd *)c;
 

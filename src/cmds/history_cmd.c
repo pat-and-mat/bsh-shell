@@ -24,14 +24,14 @@ void history_cmd_init_allocated(struct history_cmd *c)
     cmd_init_allocated((struct cmd *)(&c->base), CMD_T_CD, history_cmd_run, history_cmd_print);
 }
 
-bool history_cmd_run(struct cmd *c)
+bool history_cmd_run(struct cmd *c, bool is_root)
 {
     struct history_cmd *history = (struct history_cmd *)c;
 
     int saved_stdout = dup(STDOUT_FILENO);
 
     for (int i = 0; i < vector_count(history->base.redirects); i++)
-        cmd_run(vector_get(history->base.redirects, i));
+        cmd_run(vector_get(history->base.redirects, i), is_root);
 
     if (vector_count(history->base.args) == 1)
     {

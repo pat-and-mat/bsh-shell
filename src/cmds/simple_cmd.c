@@ -40,7 +40,7 @@ void simple_cmd_add_redirect(struct simple_cmd *c, struct cmd *redirect)
     vector_add(c->redirects, redirect);
 }
 
-bool simple_cmd_run(struct cmd *c)
+bool simple_cmd_run(struct cmd *c, bool is_root)
 {
     struct simple_cmd *simple = (struct simple_cmd *)c;
 
@@ -67,11 +67,11 @@ bool simple_cmd_run(struct cmd *c)
         exit(EXIT_FAILURE);
 
     int status;
-    waitpid(pid, &status, 0);
+    waitpid(pid, &status, WUNTRACED);
 
     simple_cmd_close_redirects(c);
 
-    if (!WIFEXITED(status) || WEXITSTATUS(status) == EXIT_FAILURE)
+    if (WIFSIGNALED(status) || (WIFEXITED(status) && WEXITSTATUS(status) == EXIT_FAILURE))
         return false;
 
     return true;
@@ -85,7 +85,7 @@ bool simple_cmd_open_redirects(struct cmd *c)
     simple->saved_stdout = dup(STDOUT_FILENO);
 
     for (int i = 0; i < vector_count(simple->redirects); i++)
-        if (!cmd_run((struct cmd *)vector_get(simple->redirects, i)))
+        if (!cmd_run((struct cmd *)vector_get(simple->redirects, i), -1))
             return false;
     return true;
 }

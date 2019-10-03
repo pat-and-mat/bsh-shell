@@ -5,7 +5,7 @@
 #include <sys/types.h>
 #include <pwd.h>
 
-#include <shell/background.h>
+#include <shell/jobs.h>
 #include <cmds/cmd.h>
 #include <cmds/jobs_cmd.h>
 #include <utils/vector.h>
@@ -24,7 +24,7 @@ void jobs_cmd_init_allocated(struct jobs_cmd *c)
     cmd_init_allocated((struct cmd *)(&c->base), CMD_T_CD, jobs_cmd_run, jobs_cmd_print);
 }
 
-bool jobs_cmd_run(struct cmd *c)
+bool jobs_cmd_run(struct cmd *c, bool is_root)
 {
     struct jobs_cmd *jobs = (struct jobs_cmd *)c;
 
@@ -38,11 +38,11 @@ bool jobs_cmd_run(struct cmd *c)
 
     if (vector_count(jobs->base.args) == 1)
     {
-        struct bg_process *process;
+        struct job *job;
         for (int i = 0; i < bg_count(); i++)
         {
-            process = bg_get(i);
-            printf("pid: %d command:%s", process->pid, process->cmd_name);
+            job = bg_get(i);
+            printf("pid: %d command:%s", job->pid, job->cmd_name);
         }
         simple_cmd_close_redirects(c);
         return true;
