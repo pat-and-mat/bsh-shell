@@ -8,95 +8,23 @@
 #include <shell/info.h>
 #include <utils/sigutils.h>
 #include <unistd.h>
+#include <string.h>
 
-struct vector bg_processes;
-struct job *fg_process;
+struct vector jobs;
 
 void jobs_init()
 {
-    vector_init_allocated(&bg_processes);
-    fg_process = NULL;
+    vector_init_allocated(&jobs);
 }
 
-struct job *jobs_job_init(pid_t pid, char *name);
-void jobs_bg_add(pid_t pid, char *name)
+struct job *jobs_job_init(pid_t pid, int status, char *cmd_name)
 {
-    vector_add(&bg_processes, jobs_job_init(pid, name));
+    struct job *job = xmalloc(sizeof(struct job));
+    job->pid = pid;
+    job->cmd = cmd_name;
+    job->status = status;
+    tcgetattr(shell_terminal, &job->tmodes);
 }
-
-struct job *jobs_job_init(pid_t pid, char *name)
-{
-    struct job *p = xmalloc(sizeof(struct job));
-    p->pid = pid;
-    p->cmd = name;
-    return p;
-}
-
-struct job *jobs_bg_get(int i)
-{
-    return (struct job *)vector_get(&bg_processes, i);
-}
-
-bool jobs_bg_contains(pid_t pid)
-{
-    struct job *job;
-    for (int i = 0; i < vector_count(&bg_processes); i++)
-    {
-        job = (struct job *)vector_get(&bg_processes, i);
-        if (job->pid == pid)
-            return true;
-    }
-    return false;
-}
-
-int jobs_bg_count()
-{
-    return vector_count(&bg_processes);
-}
-
-void jobs_bg_clean_all()
-{
-    struct job *job;
-    for (int i = 0; i < vector_count(&bg_processes); i++)
-    {
-        job = (struct job *)vector_get(&bg_processes, i);
-        kill(job->pid, SIGKILL);
-        vector_delete(&bg_processes, i);
-        i--;
-    }
-}
-
-void jobs_bg_clean_finished()
-{
-    struct job *job;
-    for (int i = 0; i < vector_count(&bg_processes); i++)
-    {
-        job = (struct job *)vector_get(&bg_processes, i);
-        if (waitpid(job->pid, NULL, WNOHANG) > 0)
-        {
-            vector_delete(&bg_processes, i);
-            i--;
-        }
-    }
-}
-
-void jobs_fg_to_bg()
-{
-    jobs_bg_add(fg_process->pid, "<cmd name>");
-    vector_add(&bg_processes, fg_process);
-}
-
-void jobs_set_fg(pid_t pid, char *name)
-{
-    fg_process = jobs_job_init(pid, name);
-}
-
-struct job *jobs_get_fg()
-{
-    return fg_process;
-}
-
-// New
 
 bool jobs_run_fg(struct cmd *c)
 {
@@ -123,7 +51,10 @@ bool jobs_run_fg(struct cmd *c)
     setpgid(job_pid, job_pid);
     tcsetpgrp(shell_terminal, job_pid);
 
-    bool job_status = wait_for_job(job_pid);
+    char *cmd_name = xmalloc(sizeof(char) * 4096);
+    cmd_get_str(c, cmd_name);
+    struct job *job = jobs_job_init(job_pid, JOB_STATUS_RUNNING, cmd_name);
+    bool job_status = wait_for_job(job);
 
     tcsetpgrp(shell_terminal, getpgrp());
     tcsetattr(shell_terminal, TCSADRAIN, &shell_tmodes);
@@ -133,22 +64,125 @@ bool jobs_run_fg(struct cmd *c)
 
 bool jobs_run_bg(struct cmd *c)
 {
+    pid_t job_pid = fork();
+    if (job_pid == -1)
+        return false;
+
+    if (!job_pid)
+    {
+        signals_default();
+        setpgid(0, 0);
+        if (!cmd_run_process(c))
+            exit(EXIT_FAILURE);
+        exit(EXIT_SUCCESS);
+    }
+
+    setpgid(job_pid, job_pid);
+
+    char *cmd_name = xmalloc(sizeof(char) * 4096);
+    cmd_get_str(c, cmd_name);
+    struct job *job = jobs_job_init(job_pid, JOB_STATUS_RUNNING, cmd_name);
+    vector_add(&jobs, job);
+
     return true;
+}
+
+bool wait_for_job(struct job *job)
+{
+    int status;
+    waitpid(job->pid, &status, WUNTRACED);
+    if (WIFSTOPPED(status))
+    {
+        job->status = JOB_STATUS_STOPPED;
+        vector_add(&jobs, job);
+        return true;
+    }
+    return WIFEXITED(status) && WEXITSTATUS(status) == EXIT_SUCCESS;
+}
+
+bool jobs_bg_to_fg(pid_t pid);
+
+int jobs_count()
+{
+    return vector_count(&jobs);
+}
+
+struct job *jobs_get(int i)
+{
+    return (struct job *)vector_get(&jobs, i);
+}
+
+char *jobs_format_status(int status)
+{
+    switch (status)
+    {
+    case JOB_STATUS_DONE:
+        return "done";
+    case JOB_STATUS_RUNNING:
+        return "running";
+    case JOB_STATUS_STOPPED:
+        return "stopped";
+    case JOB_STATUS_FAILED:
+        return "failed";
+    default:
+        return "job mode";
+    }
+}
+
+bool job_handle_status_update(struct job *job, int status);
+
+void jobs_update()
+{
+    struct job *job;
+    int status;
+    for (int i = 0; i < jobs_count(); i++)
+    {
+        job = jobs_get(i);
+        if (waitpid(job->pid, &status, WNOHANG | WUNTRACED) > 0 &&
+            job_handle_status_update(job, status))
+            vector_delete(&jobs, i--);
+    }
+}
+
+bool job_handle_status_update(struct job *job, int status)
+{
+    if (WIFSTOPPED(status))
+        job->status = JOB_STATUS_STOPPED;
+    else if (WIFEXITED(status))
+    {
+        if (WEXITSTATUS(status) == EXIT_FAILURE)
+            job->status = JOB_STATUS_FAILED;
+        else
+            job->status = JOB_STATUS_DONE;
+    }
+    else if (WIFSIGNALED(status))
+        job->status = JOB_STATUS_FAILED;
+
+    return job->status = JOB_STATUS_FAILED || job->status == JOB_STATUS_DONE;
+}
+
+void jobs_kill()
+{
+    struct job *job;
+    for (int i = 0; i < jobs_count(); i++)
+    {
+        job = jobs_get(i);
+        kill(job->pid, SIGKILL);
+    }
+    memset(&jobs, 0, sizeof(struct vector));
 }
 
 bool jobs_bg_to_fg(pid_t pid)
 {
-    // struct job *job;
-    // for (int i = 0; i < vector_count(&bg_processes); i++)
-    // {
-    //     job = (struct job *)vector_get(&bg_processes, i);
-    //     if (job->pid == pid)
-    //     {
-    //         vector_delete(&bg_processes, i);
-    //         jobs_set_fg(job->pid, job->cmd);
-    //         return job;
-    //     }
-    // }
-    // return NULL;
-    return true;
+    struct job *job;
+    for (int i = 0; i < jobs_count(); i++)
+    {
+        job = jobs_get(i);
+        if (job->pid == pid)
+        {
+            vector_delete(&jobs, i);
+            return wait_for_job(job);
+        }
+    }
+    return false;
 }
