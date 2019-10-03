@@ -7,6 +7,7 @@
 #include <utils/xmemory.h>
 #include <shell/info.h>
 #include <utils/sigutils.h>
+#include <unistd.h>
 
 struct vector bg_processes;
 struct job *fg_process;
@@ -114,7 +115,7 @@ bool jobs_run_fg(struct cmd *c)
         signals_default();
         setpgid(0, 0);
         tcsetpgrp(shell_terminal, getpgrp());
-        if (!simple_cmd_run_process(c))
+        if (!cmd_run_process(c))
             exit(EXIT_FAILURE);
         exit(EXIT_SUCCESS);
     }

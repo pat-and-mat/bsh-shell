@@ -40,7 +40,6 @@ int main(int argc, char *argv[])
         xmem_add_manually_allocated(line);
         if (strlen(line) == 0)
         {
-            jobs_bg_clean_all();
             printf("exit\n");
             break;
         }
@@ -64,7 +63,7 @@ int main(int argc, char *argv[])
             last_cmd_status = cmd_run_job(cmd);
         }
 
-        jobs_bg_clean_finished();
+        jobs_update();
     }
 
     close_session();
@@ -82,6 +81,7 @@ void open_session()
 
 void close_session()
 {
+    jobs_kill();
     history_save();
     xmem_free();
 }

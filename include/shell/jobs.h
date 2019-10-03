@@ -19,19 +19,6 @@ struct job
     bool notified;
 };
 
-void jobs_bg_add(pid_t pid, char *name);
-bool jobs_bg_contains(pid_t pid);
-
-void jobs_bg_clean_all();
-void jobs_bg_clean_finished();
-
-void jobs_fg_to_bg();
-
-void jobs_set_fg(pid_t pid, char *name);
-struct job *jobs_get_fg();
-
-// New functions
-
 void jobs_init();
 bool wait_for_job(pid_t pid);
 
@@ -43,5 +30,8 @@ bool jobs_bg_to_fg(pid_t pid);
 int jobs_count();
 struct job *jobs_get(int i);
 char *jobs_format_status(int status);
+
+void jobs_update();
+void jobs_kill();
 
 #endif
