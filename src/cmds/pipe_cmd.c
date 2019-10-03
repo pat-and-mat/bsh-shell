@@ -20,7 +20,10 @@ struct pipe_cmd *pipe_cmd_init()
 
 void pipe_cmd_init_allocated(struct pipe_cmd *c)
 {
-    cmd_init_allocated(&c->base, CMD_T_PIPE_CMD, pipe_cmd_run, pipe_cmd_print);
+    cmd_init_allocated(&c->base, CMD_T_PIPE_CMD,
+                       jobs_run_fg,
+                       pipe_cmd_run_process,
+                       pipe_cmd_print);
     c->left = NULL;
     c->right = NULL;
 }
@@ -44,40 +47,10 @@ void pipe_cmd_set_right(struct pipe_cmd *c, struct cmd *right)
     c->right = right;
 }
 
-void pipe_run_pipe_main(struct pipe_cmd *pipe_cmd);
-bool pipe_cmd_run(struct cmd *c, bool is_root)
+bool pipe_cmd_run_process(struct cmd *c)
 {
     struct pipe_cmd *pipe_cmd = (struct pipe_cmd *)c;
 
-    pid_t pid_right = fork();
-
-    if (pid_right == -1)
-        return false;
-
-    if (!pid_right)
-    {
-        if (setpgid(0, 0) == -1)
-            exit(EXIT_FAILURE);
-        pipe_run_pipe_main(pipe_cmd);
-    }
-
-    int status;
-    int flags = 0;
-    if (is_root)
-    {
-        flags = WUNTRACED;
-        jobs_set_fg(pid_right, "<cmd name>");
-    }
-    waitpid(pid_right, &status, flags);
-
-    if (WIFSIGNALED(status) || (WIFEXITED(status) && WEXITSTATUS(status) == EXIT_FAILURE))
-        return false;
-
-    return true;
-}
-
-void pipe_run_pipe_main(struct pipe_cmd *pipe_cmd)
-{
     int pipefd[2];
     pipe(pipefd);
 
@@ -87,31 +60,44 @@ void pipe_run_pipe_main(struct pipe_cmd *pipe_cmd)
     {
         close(pipefd[0]);
         close(pipefd[1]);
-        exit(EXIT_FAILURE);
+        return false;
     }
 
     if (!pid_left)
     {
         close(pipefd[0]);
-        if (dup2(pipefd[1], STDOUT_FILENO) == -1 || !cmd_run(pipe_cmd->left, false))
+        if (dup2(pipefd[1], STDOUT_FILENO) == -1 || !cmd_run(pipe_cmd->left))
             exit(EXIT_FAILURE);
         exit(EXIT_SUCCESS);
     }
 
-    close(pipefd[1]);
-    if (dup2(pipefd[0], STDIN_FILENO) == -1 || !cmd_run(pipe_cmd->right, false))
+    pid_t pid_right = fork();
+
+    if (pid_right == -1)
     {
-        waitpid(pid_left, NULL, 0);
-        exit(EXIT_FAILURE);
+        close(pipefd[0]);
+        close(pipefd[1]);
+        return false;
     }
 
-    int status;
-    waitpid(pid_left, &status, 0);
+    if (!pid_right)
+    {
+        close(pipefd[1]);
+        if (dup2(pipefd[0], STDIN_FILENO) == -1 || !cmd_run(pipe_cmd->right))
+            exit(EXIT_FAILURE);
+        exit(EXIT_SUCCESS);
+    }
 
-    if (WIFSIGNALED(status) || (WIFEXITED(status) && WEXITSTATUS(status) == EXIT_FAILURE))
-        exit(EXIT_FAILURE);
+    close(pipefd[0]);
+    close(pipefd[1]);
 
-    exit(EXIT_SUCCESS);
+    int right_status;
+    int left_status;
+
+    waitpid(pid_left, &left_status, 0);
+    waitpid(pid_right, &right_status, 0);
+    return WIFEXITED(left_status) && WEXITSTATUS(left_status) == EXIT_SUCCESS &&
+           WIFEXITED(right_status) && WEXITSTATUS(right_status) == EXIT_SUCCESS;
 }
 
 void pipe_cmd_print(struct cmd *c)
