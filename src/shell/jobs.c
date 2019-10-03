@@ -2,6 +2,8 @@
 #include <signal.h>
 #include <wait.h>
 #include <shell/jobs.h>
+#include <utils/vector.h>
+#include <utils/xmemory.h>
 
 struct vector bg_processes;
 struct job fg_process;
