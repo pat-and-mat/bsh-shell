@@ -26,7 +26,7 @@ bool right_cmd_run(struct cmd *c)
 {
     struct right_cmd *right = (struct right_cmd *)c;
 
-    right->base.fd = open(right->base.filename, O_RDWR | O_CREAT | O_TRUNC, 777);
+    right->base.fd = open(right->base.filename, O_RDWR | O_CREAT | O_TRUNC, 0777);
     if (right->base.fd == -1)
         return false;
 
