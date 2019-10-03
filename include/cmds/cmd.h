@@ -28,5 +28,6 @@ int cmd_get_type(struct cmd *c);
 bool cmd_run_job(struct cmd *c);
 bool cmd_run_process(struct cmd *c);
 void cmd_print(struct cmd *c);
+void cmd_str(struct cmd *c, char *str);
 
 #endif

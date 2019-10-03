@@ -35,3 +35,8 @@ void cmd_print(struct cmd *c)
 {
     (*c->print)(c);
 }
+
+void cmd_str(struct cmd *c, char *str)
+{
+    sprintf(str, "<cmd name>");
+}
