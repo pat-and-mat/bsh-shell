@@ -4,9 +4,9 @@
 #include <stdbool.h>
 #include <sys/types.h>
 
-#define STATUS_RUNNING
-#define STATUS_STOPPED
-#define STATUS_DONE
+#define JOB_STATUS_RUNNING 1
+#define JOB_STATUS_STOPPED 2
+#define JOB_STATUS_DONE 3
 
 struct job
 {
