@@ -1,33 +1,4 @@
 ### Shell Grammar
-
-```
-    <command line>      ::=      <job> ';' <command line>
-                            |    <job> '&' <command line>
-                            |    <job> ';'
-                            |    <job> '&'
-                            |    <job>
-
-    <job>               ::=      <job> '|' <command>
-                            |    <command>
-
-    <command>           ::=      <simple command> '<' <str>
-                            |    <simple command> '>' <str>
-                            |    <simple command> '>>' <str>
-                            |    <simple command>
-
-    <simple command>    ::=      <cd command>
-                            |    <path command>
-
-    <cd command>        ::=      'cd' <str>
-                            |    'cd'
-
-    <path command>      ::=      <str> <path command>
-                            |    <str>
-```
-
-### Shell Grammar for recursive descent parser
-### Removed left recursion and left factoring
-
 ```
     <command line>      ::=     <job> <command line 1>
                             |   epsilon
@@ -57,4 +28,3 @@
                             |   <redirect> <arg list>
                             |   epsilon
 ```
-
