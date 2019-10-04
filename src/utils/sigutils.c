@@ -1,5 +1,6 @@
 #include <utils/sigutils.h>
 #include <signal.h>
+#include <stdio.h>
 
 void signals_ignore()
 {
@@ -8,7 +9,6 @@ void signals_ignore()
     signal(SIGTSTP, SIG_IGN);
     signal(SIGTTIN, SIG_IGN);
     signal(SIGTTOU, SIG_IGN);
-    signal(SIGCHLD, SIG_IGN);
 }
 
 void signals_default()
@@ -18,5 +18,4 @@ void signals_default()
     signal(SIGTSTP, SIG_DFL);
     signal(SIGTTIN, SIG_DFL);
     signal(SIGTTOU, SIG_DFL);
-    signal(SIGCHLD, SIG_DFL);
 }

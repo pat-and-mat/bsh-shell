@@ -140,9 +140,12 @@ void jobs_update()
     for (int i = 0; i < jobs_count(); i++)
     {
         job = jobs_get(i);
-        if (waitpid(job->pid, &status, WNOHANG | WUNTRACED) > 0 &&
-            job_handle_status_update(job, status))
-            vector_delete(&jobs, i--);
+        if (waitpid(job->pid, &status, WNOHANG | WUNTRACED) > 0)
+        {
+            printf("pid: %d status: %s command: %s\n", job->pid, jobs_format_status(job->status), job->cmd);
+            if (job_handle_status_update(job, status))
+                vector_delete(&jobs, i--);
+        }
     }
 }
 
@@ -169,7 +172,7 @@ void jobs_kill()
     for (int i = 0; i < jobs_count(); i++)
     {
         job = jobs_get(i);
-        kill(job->pid, SIGKILL);
+        kill(-job->pid, SIGKILL);
     }
     memset(&jobs, 0, sizeof(struct vector));
 }
@@ -194,18 +197,19 @@ bool jobs_bg_to_fg(pid_t pid)
 bool jobs_resume_job(struct job *job)
 {
     tcgetattr(shell_terminal, &shell_tmodes);
-    tcsetattr(shell_terminal, TCSADRAIN, &job->tmodes);
 
     tcsetpgrp(shell_terminal, job->pid);
+    tcsetattr(shell_terminal, TCSADRAIN, &job->tmodes);
 
-    if (kill(job->pid, SIGCONT) == -1)
+    if (kill(-job->pid, SIGCONT) == -1)
     {
         tcsetpgrp(shell_terminal, getpgrp());
         tcsetattr(shell_terminal, TCSADRAIN, &shell_tmodes);
         return false;
     }
 
+    bool status = wait_for_job(job);
     tcsetpgrp(shell_terminal, getpgrp());
     tcsetattr(shell_terminal, TCSADRAIN, &shell_tmodes);
-    return wait_for_job(job);
+    return status;
 }
