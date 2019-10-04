@@ -13,5 +13,6 @@ void right_append_cmd_init_allocated(struct right_append_cmd *c, char *filename)
 
 bool right_append_cmd_run(struct cmd *c);
 void right_append_cmd_print(struct cmd *c);
+void right_append_cmd_get_str(struct cmd *c, char *str);
 
 #endif

@@ -21,7 +21,8 @@ void bg_cmd_init_allocated(struct bg_cmd *c)
     cmd_init_allocated(&c->base, CMD_T_BG_CMD,
                        bg_cmd_run,
                        bg_cmd_run,
-                       bg_cmd_print);
+                       bg_cmd_print,
+                       bg_cmd_get_str);
     c->left = NULL;
     c->right = NULL;
 }
@@ -72,5 +73,23 @@ void bg_cmd_print(struct cmd *c)
     {
         printf(" ");
         cmd_print(bg->right);
+    }
+}
+
+void bg_cmd_get_str(struct cmd *c, char *str)
+{
+    struct bg_cmd *bg = (struct bg_cmd *)c;
+
+    if (!bg->left)
+        sprintf(str + strlen(str), "<error>");
+    else
+        cmd_get_str(bg->left, str + strlen(str));
+
+    sprintf(str + strlen(str), " &");
+
+    if (bg->right)
+    {
+        sprintf(str + strlen(str), " ");
+        cmd_get_str(bg->right, str + strlen(str));
     }
 }

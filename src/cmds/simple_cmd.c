@@ -27,7 +27,8 @@ void simple_cmd_init_allocated(struct simple_cmd *c, char *cmd)
     cmd_init_allocated(&c->base, CMD_T_SIMPLE_CMD,
                        jobs_run_fg,
                        simple_cmd_run_process,
-                       simple_cmd_print);
+                       simple_cmd_print,
+                       simple_cmd_get_str);
     c->args = vector_init();
     c->redirects = vector_init();
     c->saved_stdin = -1;
@@ -128,6 +129,27 @@ void simple_cmd_print(struct cmd *c)
     for (int i = 0; i < vector_count(path->redirects); i++)
     {
         printf(" ");
+        redirect = vector_get(path->redirects, i);
+        cmd_print(redirect);
+    }
+}
+
+void simple_cmd_get_str(struct cmd *c, char *str)
+{
+    struct simple_cmd *path = (struct simple_cmd *)c;
+
+    if (vector_count(path->args) == 0)
+        sprintf(str + strlen(str), "<error>");
+    else
+        sprintf(str + strlen(str), "%s", (char *)vector_get(path->args, 0));
+
+    for (int i = 1; i < vector_count(path->args); i++)
+        sprintf(str + strlen(str), " %s", (char *)vector_get(path->args, i));
+
+    struct cmd *redirect;
+    for (int i = 0; i < vector_count(path->redirects); i++)
+    {
+        sprintf(str + strlen(str), " ");
         redirect = vector_get(path->redirects, i);
         cmd_print(redirect);
     }

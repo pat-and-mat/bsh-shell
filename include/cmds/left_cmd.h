@@ -13,5 +13,6 @@ void left_cmd_init_allocated(struct left_cmd *c, char *filename);
 
 bool left_cmd_run(struct cmd *c);
 void left_cmd_print(struct cmd *c);
+void left_cmd_get_str(struct cmd *c, char *str);
 
 #endif

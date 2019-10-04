@@ -26,7 +26,8 @@ void fg_cmd_init_allocated(struct fg_cmd *c)
     cmd_init_allocated((struct cmd *)(&c->base), CMD_T_CD,
                        fg_cmd_run,
                        fg_cmd_run,
-                       fg_cmd_print);
+                       simple_cmd_print,
+                       simple_cmd_get_str);
 }
 
 bool fg_cmd_run(struct cmd *c)
@@ -56,9 +57,4 @@ bool fg_cmd_run(struct cmd *c)
 
     simple_cmd_close_redirects(c);
     return false;
-}
-
-void fg_cmd_print(struct cmd *c)
-{
-    simple_cmd_print(c);
 }

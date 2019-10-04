@@ -24,7 +24,8 @@ void history_cmd_init_allocated(struct history_cmd *c)
     cmd_init_allocated((struct cmd *)(&c->base), CMD_T_CD,
                        history_cmd_run,
                        history_cmd_run,
-                       history_cmd_print);
+                       simple_cmd_print,
+                       simple_cmd_get_str);
 }
 
 bool history_cmd_run(struct cmd *c)
@@ -48,9 +49,4 @@ bool history_cmd_run(struct cmd *c)
 
     simple_cmd_close_redirects(c);
     return false;
-}
-
-void history_cmd_print(struct cmd *c)
-{
-    simple_cmd_print(c);
 }

@@ -21,5 +21,6 @@ void pipe_cmd_set_right(struct pipe_cmd *c, struct cmd *right);
 
 bool pipe_cmd_run_process(struct cmd *c);
 void pipe_cmd_print(struct cmd *c);
+void pipe_cmd_get_str(struct cmd *c, char *str);
 
 #endif

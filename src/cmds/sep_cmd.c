@@ -19,7 +19,8 @@ void sep_cmd_init_allocated(struct sep_cmd *c)
     cmd_init_allocated(&c->base, CMD_T_SEP_CMD,
                        sep_cmd_run,
                        sep_cmd_run,
-                       sep_cmd_print);
+                       sep_cmd_print,
+                       sep_cmd_get_str);
     c->left = NULL;
     c->right = NULL;
 }
@@ -70,5 +71,23 @@ void sep_cmd_print(struct cmd *c)
     {
         printf(" ");
         cmd_print(sep->right);
+    }
+}
+
+void sep_cmd_get_str(struct cmd *c, char *str)
+{
+    struct sep_cmd *sep = (struct sep_cmd *)c;
+
+    if (!sep->left)
+        sprintf(str + strlen(str), "<error>");
+    else
+        cmd_get_str(sep->left, str + strlen(str));
+
+    sprintf(str + strlen(str), " ;");
+
+    if (sep->right)
+    {
+        sprintf(str + strlen(str), " ");
+        cmd_get_str(sep->right, str + strlen(str));
     }
 }

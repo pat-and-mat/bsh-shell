@@ -23,7 +23,8 @@ void pipe_cmd_init_allocated(struct pipe_cmd *c)
     cmd_init_allocated(&c->base, CMD_T_PIPE_CMD,
                        jobs_run_fg,
                        pipe_cmd_run_process,
-                       pipe_cmd_print);
+                       pipe_cmd_print,
+                       pipe_cmd_get_str);
     c->left = NULL;
     c->right = NULL;
 }
@@ -115,4 +116,21 @@ void pipe_cmd_print(struct cmd *c)
         printf("<error>");
     else
         cmd_print(pipe->right);
+}
+
+void pipe_cmd_get_str(struct cmd *c, char *str)
+{
+    struct pipe_cmd *pipe = (struct pipe_cmd *)c;
+
+    if (!pipe->left)
+        sprintf(str + strlen(str), "<error>");
+    else
+        cmd_get_str(pipe->left, str + strlen(str));
+
+    sprintf(str + strlen(str), " | ");
+
+    if (!pipe->right)
+        sprintf(str + strlen(str), "<error>");
+    else
+        cmd_get_str(pipe->right, str + strlen(str));
 }

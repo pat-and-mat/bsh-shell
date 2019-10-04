@@ -22,7 +22,8 @@ void right_append_cmd_init_allocated(struct right_append_cmd *c, char *filename)
     cmd_init_allocated((struct cmd *)&c->base, CMD_T_LEFT_CMD,
                        right_append_cmd_run,
                        right_append_cmd_run,
-                       right_append_cmd_print);
+                       right_append_cmd_print,
+                       right_append_cmd_get_str);
 }
 
 bool right_append_cmd_run(struct cmd *c)
@@ -49,4 +50,16 @@ void right_append_cmd_print(struct cmd *c)
         printf("<error>");
     else
         printf("%s", right_append->base.filename);
+}
+
+void right_append_cmd_get_str(struct cmd *c, char *str)
+{
+    struct right_append_cmd *right_append = (struct right_append_cmd *)c;
+
+    sprintf(str + strlen(str), ">> ");
+
+    if (!right_append->base.filename)
+        sprintf(str + strlen(str), "<error>");
+    else
+        sprintf(str + strlen(str), "%s", right_append->base.filename);
 }

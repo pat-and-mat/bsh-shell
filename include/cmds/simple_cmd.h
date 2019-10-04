@@ -21,5 +21,6 @@ void simple_cmd_add_redirect(struct simple_cmd *c, struct cmd *redirect);
 bool simple_cmd_open_redirects(struct cmd *c);
 void simple_cmd_close_redirects(struct cmd *c);
 void simple_cmd_print(struct cmd *c);
+void simple_cmd_get_str(struct cmd *c, char *str);
 
 #endif

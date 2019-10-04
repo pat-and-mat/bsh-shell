@@ -8,12 +8,14 @@
 void cmd_init_allocated(struct cmd *c, int type,
                         bool (*run_job)(struct cmd *c),
                         bool (*run_process)(struct cmd *c),
-                        void (*print)(struct cmd *c))
+                        void (*print)(struct cmd *c),
+                        void (*get_str)(struct cmd *c, char *str))
 {
     c->type = type;
     c->run_job = run_job;
     c->run_process = run_process;
     c->print = print;
+    c->get_str = get_str;
 }
 
 int cmd_get_type(struct cmd *c)
@@ -38,5 +40,5 @@ void cmd_print(struct cmd *c)
 
 void cmd_get_str(struct cmd *c, char *str)
 {
-    sprintf(str, "<cmd name>");
+    return (*c->get_str)(c, str);
 }
