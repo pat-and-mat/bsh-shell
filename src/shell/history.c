@@ -71,7 +71,8 @@ void history_add(char *cmd_line)
 {
     while (history_count() == history.hist_n)
         vector_delete(history.commands, 0);
-    vector_add(history.commands, cmd_line);
+    if (history_count() == 0 || strcmp(history_last(), cmd_line))
+        vector_add(history.commands, cmd_line);
 }
 
 int history_count()
