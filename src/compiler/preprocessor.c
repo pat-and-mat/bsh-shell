@@ -48,6 +48,7 @@ bool preprocessor_preprocess(struct text_stream *stream, struct text_stream **ou
     int len = strlen(stream->text);
 
     char *text = xmalloc(sizeof(char) * (len + 1));
+    text[0] = '\0';
 
     int state = STATE_START;
     while (state != STATE_ERROR && state != STATE_DONE)

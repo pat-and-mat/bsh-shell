@@ -12,6 +12,7 @@
 #include <cmds/redirect_cmd.h>
 #include <utils/vector.h>
 #include <utils/xmemory.h>
+#include <shell/jobs.h>
 
 struct simple_cmd *simple_cmd_init(char *cmd)
 {
@@ -20,9 +21,13 @@ struct simple_cmd *simple_cmd_init(char *cmd)
     return simple_cmd;
 }
 
+bool simple_cmd_run_process(struct cmd *c);
 void simple_cmd_init_allocated(struct simple_cmd *c, char *cmd)
 {
-    cmd_init_allocated(&c->base, CMD_T_SIMPLE_CMD, simple_cmd_run, simple_cmd_print);
+    cmd_init_allocated(&c->base, CMD_T_SIMPLE_CMD,
+                       jobs_run_fg,
+                       simple_cmd_run_process,
+                       simple_cmd_print);
     c->args = vector_init();
     c->redirects = vector_init();
     c->saved_stdin = -1;
@@ -40,7 +45,7 @@ void simple_cmd_add_redirect(struct simple_cmd *c, struct cmd *redirect)
     vector_add(c->redirects, redirect);
 }
 
-bool simple_cmd_run(struct cmd *c)
+bool simple_cmd_run_process(struct cmd *c)
 {
     struct simple_cmd *simple = (struct simple_cmd *)c;
 
@@ -57,24 +62,23 @@ bool simple_cmd_run(struct cmd *c)
         return false;
     }
 
-    char *args[vector_count(simple->args) + 1];
-    args[0] = basename((char *)vector_get(simple->args, 0));
-    for (int i = 1; i < vector_count(simple->args) + 1; i++)
-        args[i] = (char *)vector_get(simple->args, i);
-    args[vector_count(simple->args)] = NULL;
+    if (!pid)
+    {
+        char *args[vector_count(simple->args) + 1];
+        args[0] = basename((char *)vector_get(simple->args, 0));
+        for (int i = 1; i < vector_count(simple->args); i++)
+            args[i] = (char *)vector_get(simple->args, i);
+        args[vector_count(simple->args)] = NULL;
 
-    if (!pid && execvp((char *)vector_get(simple->args, 0), args) == -1)
-        exit(EXIT_FAILURE);
+        if (execvp((char *)vector_get(simple->args, 0), args) == -1)
+            exit(EXIT_FAILURE);
+    }
 
     int status;
     waitpid(pid, &status, 0);
-
     simple_cmd_close_redirects(c);
 
-    if (!WIFEXITED(status) || WEXITSTATUS(status) == EXIT_FAILURE)
-        return false;
-
-    return true;
+    return WIFEXITED(status) && WEXITSTATUS(status) == EXIT_SUCCESS;
 }
 
 bool simple_cmd_open_redirects(struct cmd *c)
@@ -85,7 +89,7 @@ bool simple_cmd_open_redirects(struct cmd *c)
     simple->saved_stdout = dup(STDOUT_FILENO);
 
     for (int i = 0; i < vector_count(simple->redirects); i++)
-        if (!cmd_run((struct cmd *)vector_get(simple->redirects, i)))
+        if (!cmd_run_process((struct cmd *)vector_get(simple->redirects, i)))
             return false;
     return true;
 }

@@ -7,6 +7,7 @@
 #include <cmds/bg_cmd.h>
 #include <utils/vector.h>
 #include <utils/xmemory.h>
+#include <shell/jobs.h>
 
 struct bg_cmd *bg_cmd_init()
 {
@@ -17,7 +18,10 @@ struct bg_cmd *bg_cmd_init()
 
 void bg_cmd_init_allocated(struct bg_cmd *c)
 {
-    cmd_init_allocated(&c->base, CMD_T_BG_CMD, bg_cmd_run, bg_cmd_print);
+    cmd_init_allocated(&c->base, CMD_T_BG_CMD,
+                       bg_cmd_run,
+                       bg_cmd_run,
+                       bg_cmd_print);
     c->left = NULL;
     c->right = NULL;
 }
@@ -44,7 +48,13 @@ void bg_cmd_set_right(struct bg_cmd *c, struct cmd *right)
 
 bool bg_cmd_run(struct cmd *c)
 {
-    return true;
+    struct bg_cmd *bg = (struct bg_cmd *)c;
+
+    bool result = true;
+    result = result && jobs_run_bg(bg->left);
+    result = result && (!bg->right || cmd_run_job(bg->right));
+
+    return result;
 }
 
 void bg_cmd_print(struct cmd *c)

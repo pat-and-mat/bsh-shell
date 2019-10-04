@@ -9,6 +9,7 @@
 #include <cmds/pipe_cmd.h>
 #include <utils/vector.h>
 #include <utils/xmemory.h>
+#include <shell/jobs.h>
 
 struct pipe_cmd *pipe_cmd_init()
 {
@@ -19,7 +20,10 @@ struct pipe_cmd *pipe_cmd_init()
 
 void pipe_cmd_init_allocated(struct pipe_cmd *c)
 {
-    cmd_init_allocated(&c->base, CMD_T_PIPE_CMD, pipe_cmd_run, pipe_cmd_print);
+    cmd_init_allocated(&c->base, CMD_T_PIPE_CMD,
+                       jobs_run_fg,
+                       pipe_cmd_run_process,
+                       pipe_cmd_print);
     c->left = NULL;
     c->right = NULL;
 }
@@ -43,7 +47,7 @@ void pipe_cmd_set_right(struct pipe_cmd *c, struct cmd *right)
     c->right = right;
 }
 
-bool pipe_cmd_run(struct cmd *c)
+bool pipe_cmd_run_process(struct cmd *c)
 {
     struct pipe_cmd *pipe_cmd = (struct pipe_cmd *)c;
 
@@ -62,7 +66,7 @@ bool pipe_cmd_run(struct cmd *c)
     if (!pid_left)
     {
         close(pipefd[0]);
-        if (dup2(pipefd[1], STDOUT_FILENO) == -1 || !cmd_run(pipe_cmd->left))
+        if (dup2(pipefd[1], STDOUT_FILENO) == -1 || !cmd_run_process(pipe_cmd->left))
             exit(EXIT_FAILURE);
         exit(EXIT_SUCCESS);
     }
@@ -79,7 +83,7 @@ bool pipe_cmd_run(struct cmd *c)
     if (!pid_right)
     {
         close(pipefd[1]);
-        if (dup2(pipefd[0], STDIN_FILENO) == -1 || !cmd_run(pipe_cmd->right))
+        if (dup2(pipefd[0], STDIN_FILENO) == -1 || !cmd_run_process(pipe_cmd->right))
             exit(EXIT_FAILURE);
         exit(EXIT_SUCCESS);
     }

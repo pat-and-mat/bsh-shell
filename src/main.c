@@ -2,9 +2,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <signal.h>
 
+#include <shell/info.h>
 #include <shell/minimalistic_prompt.h>
 #include <shell/history.h>
+#include <shell/jobs.h>
 #include <compiler/text_stream.h>
 #include <compiler/token_stream.h>
 #include <compiler/preprocessor.h>
@@ -13,6 +16,7 @@
 #include <cmds/cmd.h>
 #include <utils/xmemory.h>
 #include <utils/colors.h>
+#include <utils/sigutils.h>
 
 void open_session();
 void close_session();
@@ -57,8 +61,10 @@ int main(int argc, char *argv[])
             cmd_print(cmd);
             printf("\n");
 
-            last_cmd_status = cmd_run(cmd);
+            last_cmd_status = cmd_run_job(cmd);
         }
+
+        jobs_update(false);
     }
 
     close_session();
@@ -70,10 +76,15 @@ void open_session()
     xmem_init();
     history_init("/tmp/bsh_history");
     history_load();
+    shell_info_init();
+
+    jobs_init();
+    signals_ignore();
 }
 
 void close_session()
 {
+    jobs_kill();
     history_save();
     xmem_free();
 }
