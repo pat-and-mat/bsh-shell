@@ -21,5 +21,6 @@ void sep_cmd_set_right(struct sep_cmd *c, struct cmd *right);
 
 bool sep_cmd_run(struct cmd *c);
 void sep_cmd_print(struct cmd *c);
+void sep_cmd_get_str(struct cmd *c, char *str);
 
 #endif

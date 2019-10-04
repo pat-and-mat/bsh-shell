@@ -13,5 +13,6 @@ void history_cmd_init_allocated(struct history_cmd *c);
 
 bool history_cmd_run(struct cmd *c);
 void history_cmd_print(struct cmd *c);
+void history_cmd_get_str(struct cmd *c, char *str);
 
 #endif

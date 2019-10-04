@@ -18,12 +18,14 @@ struct cmd
     bool (*run_job)(struct cmd *c);
     bool (*run_process)(struct cmd *c);
     void (*print)(struct cmd *c);
+    void (*get_str)(struct cmd *c, char *str);
 };
 
 void cmd_init_allocated(struct cmd *c, int type,
                         bool (*run_job)(struct cmd *c),
                         bool (*run_process)(struct cmd *c),
-                        void (*print)(struct cmd *c));
+                        void (*print)(struct cmd *c),
+                        void (*get_str)(struct cmd *c, char *str));
 int cmd_get_type(struct cmd *c);
 bool cmd_run_job(struct cmd *c);
 bool cmd_run_process(struct cmd *c);

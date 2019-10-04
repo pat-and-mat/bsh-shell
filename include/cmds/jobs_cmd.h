@@ -13,5 +13,6 @@ void jobs_cmd_init_allocated(struct jobs_cmd *c);
 
 bool jobs_cmd_run(struct cmd *c);
 void jobs_cmd_print(struct cmd *c);
+void jobs_cmd_get_str(struct cmd *c, char *str);
 
 #endif

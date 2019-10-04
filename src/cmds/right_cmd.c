@@ -22,7 +22,8 @@ void right_cmd_init_allocated(struct right_cmd *c, char *filename)
     cmd_init_allocated((struct cmd *)&c->base, CMD_T_LEFT_CMD,
                        right_cmd_run,
                        right_cmd_run,
-                       right_cmd_print);
+                       right_cmd_print,
+                       right_cmd_get_str);
 }
 
 bool right_cmd_run(struct cmd *c)
@@ -49,4 +50,16 @@ void right_cmd_print(struct cmd *c)
         printf("<error>");
     else
         printf("%s", right->base.filename);
+}
+
+void right_cmd_get_str(struct cmd *c, char *str)
+{
+    struct right_cmd *right = (struct right_cmd *)c;
+
+    sprintf(str + strlen(str), "> ");
+
+    if (!right->base.filename)
+        sprintf(str + strlen(str), "<error>");
+    else
+        sprintf(str + strlen(str), "%s", right->base.filename);
 }

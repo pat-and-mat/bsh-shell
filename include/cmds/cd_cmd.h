@@ -13,5 +13,6 @@ void cd_cmd_init_allocated(struct cd_cmd *c);
 
 bool cd_cmd_run(struct cmd *c);
 void cd_cmd_print(struct cmd *c);
+void cd_cmd_get_str(struct cmd *c, char *str);
 
 #endif
