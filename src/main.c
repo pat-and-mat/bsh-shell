@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
             last_cmd_status = cmd_run_job(cmd);
         }
 
-        jobs_update();
+        jobs_update(false);
     }
 
     close_session();

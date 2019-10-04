@@ -43,7 +43,7 @@ bool jobs_cmd_run(struct cmd *c)
         for (int i = 0; i < jobs_count(); i++)
         {
             job = jobs_get(i);
-            printf("pid: %d status: %s command: %s\n", job->pid, jobs_format_status(job->status), job->cmd);
+            jobs_update(true);
         }
         simple_cmd_close_redirects(c);
         return true;

@@ -15,6 +15,7 @@ struct job
 {
     pid_t pid;
     int status;
+    bool notified;
     char *cmd;
     struct termios tmodes;
 };
@@ -33,7 +34,7 @@ int jobs_count();
 struct job *jobs_get(int i);
 char *jobs_format_status(int status);
 
-void jobs_update();
+void jobs_update(bool all);
 void jobs_kill();
 
 #endif

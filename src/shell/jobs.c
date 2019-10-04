@@ -24,6 +24,7 @@ struct job *jobs_job_init(pid_t pid, int status, char *cmd_name)
     job->pid = pid;
     job->cmd = cmd_name;
     job->status = status;
+    job->notified = false;
     tcgetattr(shell_terminal, &job->tmodes);
     return job;
 }
@@ -72,6 +73,7 @@ bool wait_for_job(struct job *job)
     if (WIFSTOPPED(status))
     {
         job->status = JOB_STATUS_STOPPED;
+        job->notified = false;
         tcgetattr(shell_terminal, &job->tmodes);
         vector_add(&jobs, job);
         return true;
@@ -133,18 +135,20 @@ char *jobs_format_status(int status)
 
 bool job_handle_status_update(struct job *job, int status);
 
-void jobs_update()
+void jobs_update(bool all)
 {
     struct job *job;
     int status;
     for (int i = 0; i < jobs_count(); i++)
     {
         job = jobs_get(i);
-        if (waitpid(job->pid, &status, WNOHANG | WUNTRACED) > 0)
+        if (waitpid(job->pid, &status, WNOHANG | WUNTRACED) > 0 &&
+            job_handle_status_update(job, status))
+            vector_delete(&jobs, i--);
+        if (job->notified == false || all)
         {
             printf("pid: %d status: %s command: %s\n", job->pid, jobs_format_status(job->status), job->cmd);
-            if (job_handle_status_update(job, status))
-                vector_delete(&jobs, i--);
+            job->notified = true;
         }
     }
 }
@@ -163,7 +167,8 @@ bool job_handle_status_update(struct job *job, int status)
     else if (WIFSIGNALED(status))
         job->status = JOB_STATUS_FAILED;
 
-    return job->status = JOB_STATUS_FAILED || job->status == JOB_STATUS_DONE;
+    job->notified = false;
+    return job->status == JOB_STATUS_FAILED || job->status == JOB_STATUS_DONE;
 }
 
 void jobs_kill()
@@ -208,6 +213,8 @@ bool jobs_resume_job(struct job *job)
         return false;
     }
 
+    job->status = JOB_STATUS_RUNNING;
+    job->notified = false;
     bool status = wait_for_job(job);
     tcsetpgrp(shell_terminal, getpgrp());
     tcsetattr(shell_terminal, TCSADRAIN, &shell_tmodes);
