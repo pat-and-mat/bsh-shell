@@ -48,7 +48,7 @@ void history_load()
         line = NULL;
         len = 0;
     }
-
+    xmem_add_manually_allocated(line);
     fclose(hist_stream);
 }
 

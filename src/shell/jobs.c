@@ -67,10 +67,12 @@ bool jobs_run_fg(struct cmd *c)
 bool wait_for_job(struct job *job)
 {
     int status;
-    waitpid(job->pid, &status, WUNTRACED);
+    if (waitpid(job->pid, &status, WUNTRACED) == -1)
+        return false;
     if (WIFSTOPPED(status))
     {
         job->status = JOB_STATUS_STOPPED;
+        tcgetattr(shell_terminal, &job->tmodes);
         vector_add(&jobs, job);
         return true;
     }
