@@ -9,6 +9,7 @@
 #include <utils/sigutils.h>
 #include <unistd.h>
 #include <string.h>
+#include <stdio.h>
 
 struct vector jobs;
 
@@ -24,6 +25,7 @@ struct job *jobs_job_init(pid_t pid, int status, char *cmd_name)
     job->cmd = cmd_name;
     job->status = status;
     tcgetattr(shell_terminal, &job->tmodes);
+    return job;
 }
 
 bool jobs_run_fg(struct cmd *c)
@@ -170,6 +172,8 @@ void jobs_kill()
     memset(&jobs, 0, sizeof(struct vector));
 }
 
+bool jobs_resume_job(struct job *job);
+
 bool jobs_bg_to_fg(pid_t pid)
 {
     struct job *job;
@@ -179,8 +183,27 @@ bool jobs_bg_to_fg(pid_t pid)
         if (job->pid == pid)
         {
             vector_delete(&jobs, i);
-            return wait_for_job(job);
+            return jobs_resume_job(job);
         }
     }
     return false;
+}
+
+bool jobs_resume_job(struct job *job)
+{
+    tcgetattr(shell_terminal, &shell_tmodes);
+    tcsetattr(shell_terminal, TCSADRAIN, &job->tmodes);
+
+    tcsetpgrp(shell_terminal, job->pid);
+
+    if (kill(job->pid, SIGCONT) == -1)
+    {
+        tcsetpgrp(shell_terminal, getpgrp());
+        tcsetattr(shell_terminal, TCSADRAIN, &shell_tmodes);
+        return false;
+    }
+
+    tcsetpgrp(shell_terminal, getpgrp());
+    tcsetattr(shell_terminal, TCSADRAIN, &shell_tmodes);
+    return wait_for_job(job);
 }

@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <signal.h>
 
+#include <shell/info.h>
 #include <shell/minimalistic_prompt.h>
 #include <shell/history.h>
 #include <shell/jobs.h>
@@ -75,6 +76,8 @@ void open_session()
     xmem_init();
     history_init("/tmp/bsh_history");
     history_load();
+    shell_info_init();
+
     jobs_init();
     signals_ignore();
 }

@@ -66,12 +66,10 @@ bool simple_cmd_run_process(struct cmd *c)
     {
         char *args[vector_count(simple->args) + 1];
         args[0] = basename((char *)vector_get(simple->args, 0));
-        for (int i = 1; i < vector_count(simple->args) + 1; i++)
+        for (int i = 1; i < vector_count(simple->args); i++)
             args[i] = (char *)vector_get(simple->args, i);
         args[vector_count(simple->args)] = NULL;
 
-        if (setpgid(0, 0) == -1)
-            exit(EXIT_FAILURE);
         if (execvp((char *)vector_get(simple->args, 0), args) == -1)
             exit(EXIT_FAILURE);
     }
